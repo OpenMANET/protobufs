@@ -1,0 +1,2 @@
+# protobufs
+OpenMANET Protobuf Definitions
