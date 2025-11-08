@@ -14,4 +14,9 @@ enum DataType {
    Address Reservation data type
    */
   DATA_TYPE_ADDRESS_RESERVATION = 101;
+
+  /*
+    Node data type
+  */
+  DATA_TYPE_NODE = 102;
 }
