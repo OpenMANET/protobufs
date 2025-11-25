@@ -9,6 +9,10 @@ message AddressReservation {
   string static_ip = 2;
   // Reservation CIDR of the node
   string reservation_cidr = 3;
+  // UCI DHCP start address
+  string uci_dhcp_start = 4;
+  // UCI DHCP limit is the number of addresses to reserve
+  string uci_dhcp_limit = 5;
 }
 
 message Node {
