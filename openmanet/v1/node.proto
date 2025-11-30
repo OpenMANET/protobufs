@@ -13,6 +13,8 @@ message AddressReservation {
   string uci_dhcp_start = 4;
   // UCI DHCP limit is the number of addresses to reserve
   string uci_dhcp_limit = 5;
+  // Whether the node is requesting a reservation
+  bool requesting_reservation = 6;
 }
 
 message Node {
