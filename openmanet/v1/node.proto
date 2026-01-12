@@ -26,6 +26,10 @@ message Node {
   string ipaddr = 3;
   // Position of the node
   Position position = 4;
+  // UCI DHCP start address
+  string uci_dhcp_start = 5;
+  // UCI DHCP limit is the number of addresses to reserve
+  string uci_dhcp_limit = 6;
 }
 
 message Position {
