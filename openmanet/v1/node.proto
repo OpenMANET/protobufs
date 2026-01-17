@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package openmanet.v1;
 
+import "buf/validate/validate.proto";
+
 message AddressReservation {
   // MAC address of the node
   string mac = 1;
@@ -39,4 +41,24 @@ message Position {
   double longitude = 2;
   // Altitude of the node
   float altitude = 3;
+}
+
+service NodeService {
+  rpc GetNode(GetNodeRequest) returns (GetNodeResponse) {}
+  rpc ListNodes(google.protobuf.Empty) returns (ListNodesResponse) {}
+}
+
+message GetNodeRequest {
+  // Hostname of the node to retrieve
+  string hostname = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+message GetNodeResponse {
+  // Node information
+  Node node = 1;
+}
+
+message ListNodesResponse {
+  // List of nodes
+  repeated Node nodes = 1;
 }
