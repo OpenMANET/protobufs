@@ -45,15 +45,15 @@ service InterfaceService {
    * @param GetWirelessInterfaceRequest The request containing the identifier of the interface to retrieve.
    * @return WirelessInterface The details of the requested wireless interface.
    */
-  rpc GetWirelessInterface(GetWirelessInterfaceRequest) returns (WirelessInterface) {}
+  rpc GetWirelessInterface(GetWirelessInterfaceRequest) returns (GetWirelessInterfaceResponse) {}
 
   /**
    * Lists all available wireless interfaces currently managed by the system.
    *
-   * @param google.protobuf.Empty An empty request message.
+   * @param ListWirelessInterfacesRequest An empty request message.
    * @return ListWirelessInterfacesResponse A list of all wireless interfaces.
    */
-  rpc ListWirelessInterfaces(google.protobuf.Empty) returns (ListWirelessInterfacesResponse) {}
+  rpc ListWirelessInterfaces(ListWirelessInterfacesRequest) returns (ListWirelessInterfacesResponse) {}
 }
 
 /**
@@ -62,6 +62,21 @@ service InterfaceService {
 message GetWirelessInterfaceRequest {
   // The name of the wireless interface to retrieve.
   string name = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+/**
+ * Response message for retrieving details about a specific wireless interface.
+ */
+message GetWirelessInterfaceResponse {
+  // The wireless interface details.
+  WirelessInterface interface = 1;
+}
+
+/**
+ * Request message for listing wireless interfaces.
+ */
+message ListWirelessInterfacesRequest {
+  // No fields required for this request.
 }
 
 /**

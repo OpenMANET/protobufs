@@ -59,7 +59,7 @@ service StationService {
   rpc ListStations(ListStationsRequest) returns (ListStationsResponse);
 
   // GetStation retrieves information for a specific station.
-  rpc GetStation(GetStationRequest) returns (StationInfo);
+  rpc GetStation(GetStationRequest) returns (GetStationResponse);
 }
 
 // Request message for listing stations.
@@ -80,4 +80,9 @@ message GetStationRequest {
 
   // Optional: The interface index to look up the station on.
   optional int32 interface_index = 2;
+}
+
+message GetStationResponse {
+  // Station information
+  StationInfo station = 1;
 }

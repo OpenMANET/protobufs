@@ -46,7 +46,7 @@ message Position {
 
 service NodeService {
   rpc GetNode(GetNodeRequest) returns (GetNodeResponse) {}
-  rpc ListNodes(google.protobuf.Empty) returns (ListNodesResponse) {}
+  rpc ListNodes(ListNodesRequest) returns (ListNodesResponse) {}
 }
 
 message GetNodeRequest {
@@ -57,6 +57,10 @@ message GetNodeRequest {
 message GetNodeResponse {
   // Node information
   Node node = 1;
+}
+
+message ListNodesRequest {
+  // No fields required for listing nodes
 }
 
 message ListNodesResponse {
