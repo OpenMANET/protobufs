@@ -4,7 +4,6 @@ package openmanet.v1;
 
 import "buf/validate/validate.proto";
 import "google/protobuf/duration.proto";
-import "google/protobuf/empty.proto";
 
 // StationInfo represents statistics and information for a connected station.
 message StationInfo {

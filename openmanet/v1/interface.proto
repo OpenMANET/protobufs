@@ -3,6 +3,7 @@ syntax = "proto3";
 package openmanet.v1;
 
 import "buf/validate/validate.proto";
+import "google/protobuf/empty.proto";
 
 // Defines a wireless network interface and its radio characteristics.
 // Provides RPCs to fetch a specific interface by name or list all interfaces.

@@ -3,6 +3,7 @@ syntax = "proto3";
 package openmanet.v1;
 
 import "buf/validate/validate.proto";
+import "google/protobuf/empty.proto";
 
 message AddressReservation {
   // MAC address of the node
