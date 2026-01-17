@@ -16,3 +16,7 @@ information, DNS information, the local weather forecast...
 Protobufs are a language neutral way of defining an API specification used to perform low level data syncronization across the OpenMANET mesh.
 
 >It’s like JSON, except it’s smaller and faster, and it generates native language bindings. You define how you want your data to be structured once, then you can use special generated source code to easily write and read your structured data to and from a variety of data streams and using a variety of languages.
+
+## Getting Started
+Install:
+`go get buf.build/go/protovalidate`
