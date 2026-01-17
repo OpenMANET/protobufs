@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package openmanet.network.v1;
+
+// We use batman-adv alfred data types to represent different OpenMANET data types
+// sent across the mesh. This allows us to leverage existing infrastructure for
+// distributing and storing mesh data.
+// See: https://www.open-mesh.org/projects/alfred/wiki/Alfred_architecture
+enum DataType {
+  DATA_TYPE_UNSPECIFIED = 0;
+
+  /*
+   Gateway data type
+   */
+  DATA_TYPE_GATEWAY = 100;
+
+  /*
+   Address Reservation data type
+   */
+  DATA_TYPE_ADDRESS_RESERVATION = 101;
+
+  /*
+    Node data type
+  */
+  DATA_TYPE_NODE = 102;
+}

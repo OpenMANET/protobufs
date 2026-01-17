@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package openmanet.v1;
+package openmanet.network.v1;
 
 message Gateway {
   // MAC address of the gateway

@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package openmanet.service.v1;
+
+import "openmanet/network/v1/node.proto";
+
+service NodeService {
+  rpc GetNode(GetNodeRequest) returns (GetNodeResponse) {}
+  rpc ListNodes(ListNodesRequest) returns (ListNodesResponse) {}
+}
+
+message GetNodeRequest {
+  // Hostname of the node to retrieve
+  string hostname = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+message GetNodeResponse {
+  // Node information
+  openmanet.network.v1.Node node = 1;
+}
+
+message ListNodesRequest {
+  // No fields required for listing nodes
+}
+
+message ListNodesResponse {
+  // List of nodes
+  repeated openmanet.network.v1.Node nodes = 1;
+}

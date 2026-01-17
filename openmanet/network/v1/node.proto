@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package openmanet.v1;
+package openmanet.network.v1;
 
 import "buf/validate/validate.proto";
 
@@ -41,28 +41,4 @@ message Position {
   double longitude = 2;
   // Altitude of the node
   float altitude = 3;
-}
-
-service NodeService {
-  rpc GetNode(GetNodeRequest) returns (GetNodeResponse) {}
-  rpc ListNodes(ListNodesRequest) returns (ListNodesResponse) {}
-}
-
-message GetNodeRequest {
-  // Hostname of the node to retrieve
-  string hostname = 1 [(buf.validate.field).string.min_len = 1];
-}
-
-message GetNodeResponse {
-  // Node information
-  Node node = 1;
-}
-
-message ListNodesRequest {
-  // No fields required for listing nodes
-}
-
-message ListNodesResponse {
-  // List of nodes
-  repeated Node nodes = 1;
 }

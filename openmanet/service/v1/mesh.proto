@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package openmanet.service.v1;
+
+message MeshNeighbor {
+  // Neighbor node identifier.  This should be the hostname.interface_name
+  string neighbor = 1;
+
+  // Signal strength to the neighbor node
+  int32 signal_strength = 2;
+
+  // The hardware or MAC address of the neighbor node
+  string hardware_address = 3;
+
+  // signal quality to the neighbor node
+  int32 signal = 4;
+
+  // Last seen in miliseconds
+  int64 last_seen = 5;
+
+  // throughput to the neighbor node.
+  int32 throughput = 6;
+}
+
+service MeshNeighborService {
+  // ListMeshNeighbors retrieves a list of all mesh neighbors for a given interface.
+  rpc ListMeshNeighbors(ListMeshNeighborsRequest) returns (ListMeshNeighborsResponse);
+}
+
+message ListMeshNeighborsRequest {
+
+}
+
+message ListMeshNeighborsResponse {
+  // List of mesh neighbors
+  repeated MeshNeighbor neighbors = 1;
+}
