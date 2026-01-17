@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package openmanet.service.v1;
 
+import "buf/validate/validate.proto";
 import "openmanet/network/v1/node.proto";
 
 service NodeService {
