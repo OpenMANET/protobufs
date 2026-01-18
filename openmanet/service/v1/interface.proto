@@ -33,54 +33,37 @@ message WirelessInterface {
   int32 channel_width = 8;
 }
 
-/**
- * InterfaceService provides methods to manage and retrieve information about network interfaces
- * within the OpenMANET system.
- */
+
+// InterfaceService provides methods to manage and retrieve information about network interfaces
+// within the OpenMANET system.
 service InterfaceService {
-  /**
-   * Retrieves detailed configuration and status information for a specific wireless interface.
-   *
-   * @param GetWirelessInterfaceRequest The request containing the identifier of the interface to retrieve.
-   * @return WirelessInterface The details of the requested wireless interface.
-   */
+
+  // Retrieves detailed configuration and status information for a specific wireless interface.
   rpc GetWirelessInterface(GetWirelessInterfaceRequest) returns (GetWirelessInterfaceResponse) {}
 
-  /**
-   * Lists all available wireless interfaces currently managed by the system.
-   *
-   * @param ListWirelessInterfacesRequest An empty request message.
-   * @return ListWirelessInterfacesResponse A list of all wireless interfaces.
-   */
+  
+  // Lists all available wireless interfaces currently managed by the system.
   rpc ListWirelessInterfaces(ListWirelessInterfacesRequest) returns (ListWirelessInterfacesResponse) {}
 }
 
-/**
- * Request message for retrieving details about a specific wireless interface.
- */
+// Request message for retrieving details about a specific wireless interface.
 message GetWirelessInterfaceRequest {
   // The name of the wireless interface to retrieve.
   string name = 1 [(buf.validate.field).string.min_len = 1];
 }
 
-/**
- * Response message for retrieving details about a specific wireless interface.
- */
+// Response message for retrieving details about a specific wireless interface.
 message GetWirelessInterfaceResponse {
   // The wireless interface details.
   WirelessInterface interface = 1;
 }
 
-/**
- * Request message for listing wireless interfaces.
- */
+// Request message for listing wireless interfaces.
 message ListWirelessInterfacesRequest {
   // No fields required for this request.
 }
 
-/**
- * Response message for listing wireless interfaces.
- */
+// Response message for listing wireless interfaces.
 message ListWirelessInterfacesResponse {
   // The list of wireless interfaces.
   repeated WirelessInterface interfaces = 1;
