@@ -1,0 +1,2 @@
+# OpenMANET Network API
+The `network` API is used internally by OpenMANET to publish and subscribe to mesh wide messages. These are only used to advertise node information, address reservations, and network gateways.  Future features may be added, but this API is not available for use through our gRPC/REST API.
