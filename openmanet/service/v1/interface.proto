@@ -3,6 +3,7 @@ syntax = "proto3";
 package openmanet.service.v1;
 
 import "buf/validate/validate.proto";
+import "google/protobuf/empty.proto";
 
 // Defines a wireless network interface and its radio characteristics.
 // Provides RPCs to fetch a specific interface by name or list all interfaces.
@@ -43,7 +44,7 @@ service InterfaceService {
 
   
   // Lists all available wireless interfaces currently managed by the system.
-  rpc ListWirelessInterfaces(ListWirelessInterfacesRequest) returns (ListWirelessInterfacesResponse) {}
+  rpc ListWirelessInterfaces(google.protobuf.Empty) returns (ListWirelessInterfacesResponse) {}
 }
 
 // Request message for retrieving details about a specific wireless interface.
@@ -56,11 +57,6 @@ message GetWirelessInterfaceRequest {
 message GetWirelessInterfaceResponse {
   // The wireless interface details.
   WirelessInterface interface = 1;
-}
-
-// Request message for listing wireless interfaces.
-message ListWirelessInterfacesRequest {
-  // No fields required for this request.
 }
 
 // Response message for listing wireless interfaces.

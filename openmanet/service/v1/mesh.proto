@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package openmanet.service.v1;
 
+import "google/protobuf/empty.proto";
+
 message MeshNeighbor {
   // Neighbor node identifier.  This should be the hostname.interface_name
   string neighbor = 1;
@@ -25,11 +27,7 @@ message MeshNeighbor {
 // MeshNeighborService provides methods to retrieve mesh neighbor information.
 service MeshNeighborService {
   // ListMeshNeighbors retrieves a list of all mesh neighbors for a given interface.
-  rpc ListMeshNeighbors(ListMeshNeighborsRequest) returns (ListMeshNeighborsResponse);
-}
-
-message ListMeshNeighborsRequest {
-
+  rpc ListMeshNeighbors(google.protobuf.Empty) returns (ListMeshNeighborsResponse);
 }
 
 message ListMeshNeighborsResponse {
