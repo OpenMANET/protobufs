@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package openmanet.service.v1;
+
+import "google/protobuf/empty.proto";
+
+message ServiceStatus {
+  // Indicates whether the node is connected to other nodes on the mesh.
+  bool is_connected = 1;
+
+  // Number of connected neighbors.
+  int32 connected_neighbors = 2;
+
+  // Number of mesh interfaces active.
+  int32 active_mesh_interfaces = 3;
+
+  // Indicates whether the node is functioning as a mesh gateway.
+  bool is_mesh_gateway = 4;
+}
+
+// StatusService provides methods to retrieve the status of the OpenMANET service.
+service StatusService {
+  // Retrieves the current status of the OpenMANET service.
+  rpc GetServiceStatus(google.protobuf.Empty) returns (ServiceStatus);
+}
