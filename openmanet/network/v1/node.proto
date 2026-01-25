@@ -3,6 +3,8 @@ syntax = "proto3";
 package openmanet.network.v1;
 
 message AddressReservation {
+  // Address Reservation is deprecated, the data from Node is used instead.
+  option deprecated = true;
   // MAC address of the node
   string mac = 1;
   // Static IP addresses of the node

@@ -17,7 +17,7 @@ enum DataType {
   /*
    Address Reservation data type
    */
-  DATA_TYPE_ADDRESS_RESERVATION = 101;
+  DATA_TYPE_ADDRESS_RESERVATION = 101 [deprecated = true];
 
   /*
     Node data type
