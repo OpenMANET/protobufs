@@ -4,6 +4,7 @@ package openmanet.service.v1;
 
 import "google/protobuf/empty.proto";
 
+// ServiceStatus represents the current status of the OpenMANET node.
 message ServiceStatus {
   // Indicates whether the node is connected to other nodes on the mesh.
   bool is_connected = 1;
@@ -16,6 +17,19 @@ message ServiceStatus {
 
   // Indicates whether the node is functioning as a mesh gateway.
   bool is_mesh_gateway = 4;
+
+  // Current position of the node.
+  Position position = 5;
+}
+
+// Position represents the geographical position of the node if available.
+message Position {
+  // Latitude of the node
+  double latitude = 1;
+  // Longitude of the node
+  double longitude = 2;
+  // Altitude of the node
+  float altitude = 3;
 }
 
 // StatusService provides methods to retrieve the status of the OpenMANET service.
