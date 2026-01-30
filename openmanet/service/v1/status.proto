@@ -30,6 +30,8 @@ message Position {
   double longitude = 2;
   // Altitude of the node
   float altitude = 3;
+  // Number of satellites in view
+  int32 satellites_in_view = 4;
 }
 
 // StatusService provides methods to retrieve the status of the OpenMANET service.
