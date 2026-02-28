@@ -37,10 +37,10 @@ message Position {
 // StatusService provides methods to retrieve the status of the OpenMANET service.
 service StatusService {
   // Retrieves the current status of the OpenMANET service.
-  rpc GetServiceStatus(google.protobuf.Empty) returns (ServiceStatusResponse);
+  rpc GetServiceStatus(google.protobuf.Empty) returns (GetServiceStatusResponse);
 }
 
-message ServiceStatusResponse {
+message GetServiceStatusResponse {
   // The current status of the OpenMANET service.
   ServiceStatus status = 1;
 }
