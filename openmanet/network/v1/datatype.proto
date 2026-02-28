@@ -10,17 +10,17 @@ enum DataType {
   DATA_TYPE_UNSPECIFIED = 0;
 
   /*
-   Gateway data type
-   */
+     Gateway data type
+  */
   DATA_TYPE_GATEWAY = 100;
 
   /*
-   Address Reservation data type
-   */
+     Address Reservation data type
+  */
   DATA_TYPE_ADDRESS_RESERVATION = 101 [deprecated = true];
 
   /*
-    Node data type
+     Node data type
   */
   DATA_TYPE_NODE = 102;
 }

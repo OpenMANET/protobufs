@@ -1,0 +1,99 @@
+syntax = "proto3";
+
+package openmanet.service.v1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/empty.proto";
+
+// CommsService provides RPC methods for managing communication status and talkgroups
+// within the OpenMANET service.
+//
+// The service exposes the following operations:
+//   - Retrieving the current communication status of the OpenMANET service.
+//   - Joining a specified talkgroup for communication.
+//
+// Example usage:
+//   - Call GetCommsStatus to monitor the current state of communications.
+//   - Call JoinTalkGroup with a JoinTalkGroupRequest to join a specific talkgroup.
+//
+// Note: GetCommsStatus takes no request parameters (google.protobuf.Empty) and
+// returns a GetCommsStatusResponse containing the current communication status.
+// JoinTalkGroup requires a JoinTalkGroupRequest and returns a JoinTalkGroupResponse
+// indicating the result of the join operation.
+service CommsService {
+  // Retrieves the current communication status of the OpenMANET service.
+  rpc GetCommsStatus(google.protobuf.Empty) returns (GetCommsStatusResponse);
+
+  // Joins the specified talkgroup for communication.
+  rpc JoinTalkGroup(JoinTalkGroupRequest) returns (JoinTalkGroupResponse);
+}
+
+// GetCommsStatusResponse represents the current communication status of the OpenMANET node.
+message GetCommsStatusResponse {
+  // The active talkgroup the node is currently participating in.
+  TalkGroup active_talkgroup = 1;
+
+  // Available talkgroups that the node can join.
+  repeated TalkGroup available_talkgroups = 2;
+}
+
+// TalkGroup represents a communication group that uses multicast networking
+// to facilitate group communications between multiple participants.
+// It encapsulates the necessary network addressing information required
+// to join and communicate within a specific talk group.
+message TalkGroup {
+  // The multicast address of the talkgroup.
+  string address = 1 [(buf.validate.field).cel = {
+    id: "ipv4.multicast"
+    message: "must be a valid IPv4 multicast address (224.0.0.0-239.255.255.255)" // Regex checks first octet is 224-239
+    expression: "this.matches('^(22[4-9]|23[0-9])\\\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$')"
+  }];
+
+  // The port number used for the talkgroup communication.
+  int32 port = 2;
+}
+
+// JoinTalkGroupRequest is the request message for joining a multicast talk group.
+//
+// A talk group represents a multicast communication channel identified by an
+// IPv4 multicast address. Clients send this request to subscribe to and
+// participate in a specific talk group's communications.
+//
+// The address field must be a valid IPv4 multicast address within the range
+// 224.0.0.0 to 239.255.255.255, as defined by RFC 5771. Addresses outside
+// this range will be rejected with a validation error.
+//
+// Example:
+//   JoinTalkGroupRequest{
+//     address: "239.255.0.1"
+//   }
+message JoinTalkGroupRequest {
+  // The multicast address of the talkgroup to join.
+  string address = 1 [(buf.validate.field).cel = {
+    id: "ipv4.multicast"
+    message: "must be a valid IPv4 multicast address (224.0.0.0-239.255.255.255)" // Regex checks first octet is 224-239
+    expression: "this.matches('^(22[4-9]|23[0-9])\\\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$')"
+  }];
+}
+
+/**
+ * JoinTalkGroupResponse is the response message returned after a request
+ * to join a talk group has been processed.
+ *
+ * Fields:
+ *   - success: A boolean flag indicating whether the request to join the
+ *              talk group was successful. A value of `true` means the
+ *              operation succeeded, while `false` indicates a failure.
+ *
+ *   - message: An optional human-readable string providing additional
+ *              context or information about the join operation. This may
+ *              include error details if the operation was unsuccessful,
+ *              or a confirmation message if successful.
+ */
+message JoinTalkGroupResponse {
+  // Indicates whether the request to join the talkgroup was successful.
+  bool success = 1;
+
+  // Optional message providing additional information about the join operation.
+  string message = 2;
+}

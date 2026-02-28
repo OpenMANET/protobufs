@@ -34,15 +34,12 @@ message WirelessInterface {
   int32 channel_width = 8;
 }
 
-
 // InterfaceService provides methods to manage and retrieve information about network interfaces
 // within the OpenMANET system.
 service InterfaceService {
-
   // Retrieves detailed configuration and status information for a specific wireless interface.
   rpc GetWirelessInterface(GetWirelessInterfaceRequest) returns (GetWirelessInterfaceResponse) {}
 
-  
   // Lists all available wireless interfaces currently managed by the system.
   rpc ListWirelessInterfaces(google.protobuf.Empty) returns (ListWirelessInterfacesResponse) {}
 }
