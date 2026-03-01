@@ -37,43 +37,52 @@ message GetCommsStatusResponse {
   repeated TalkGroup available_talkgroups = 2;
 }
 
-// TalkGroup represents a communication group that uses multicast networking
-// to facilitate group communications between multiple participants.
-// It encapsulates the necessary network addressing information required
-// to join and communicate within a specific talk group.
+// TalkGroup represents a logical grouping for multicast communication.
+// It maps a talk group number to a specific multicast address and port,
+// enabling group-based messaging within the OpenMANET network.
+//
+// Talk group numbers are constrained to the range [0, 10], where each
+// value corresponds to a unique multicast address and port combination.
 message TalkGroup {
-  // The multicast address of the talkgroup.
-  string address = 1 [(buf.validate.field).cel = {
-    id: "ipv4.multicast"
-    message: "must be a valid IPv4 multicast address (224.0.0.0-239.255.255.255)" // Regex checks first octet is 224-239
-    expression: "this.matches('^(22[4-9]|23[0-9])\\\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$')"
-  }];
-
-  // The port number used for the talkgroup communication.
-  int32 port = 2;
+  // The talk group number, which corresponds to a specific multicast address and port.
+  int32 talkgroup = 1 [
+    (buf.validate.field).int32 = {
+      gte: 0
+      lte: 10
+    },
+    (buf.validate.field).int32.example = 1,
+    (buf.validate.field).int32.example = 3,
+    (buf.validate.field).int32.example = 5,
+    (buf.validate.field).int32.example = 7,
+    (buf.validate.field).int32.example = 9
+  ];
 }
 
 // JoinTalkGroupRequest is the request message for joining a multicast talk group.
 //
 // A talk group represents a multicast communication channel identified by an
-// IPv4 multicast address. Clients send this request to subscribe to and
-// participate in a specific talk group's communications.
-//
-// The address field must be a valid IPv4 multicast address within the range
-// 224.0.0.0 to 239.255.255.255, as defined by RFC 5771. Addresses outside
-// this range will be rejected with a validation error.
+// IPv4 multicast address and a UDP port number. All talk groups share the same
+// multicast address and are distinguished by port, so switching groups only
+// requires rebinding sockets (no IGMP leave/join overhead).
 //
 // Example:
 //   JoinTalkGroupRequest{
-//     address: "239.255.0.1"
+//     talkgroup: 1
 //   }
 message JoinTalkGroupRequest {
-  // The multicast address of the talkgroup to join.
-  string address = 1 [(buf.validate.field).cel = {
-    id: "ipv4.multicast"
-    message: "must be a valid IPv4 multicast address (224.0.0.0-239.255.255.255)" // Regex checks first octet is 224-239
-    expression: "this.matches('^(22[4-9]|23[0-9])\\\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$')"
-  }];
+  // The talk group number to join. This corresponds to a specific multicast
+  // address and port.
+  int32 talkgroup = 1 [
+    (buf.validate.field).int32 = {
+      gte: 0
+      lte: 10
+    },
+    (buf.validate.field).int32.example = 1,
+    (buf.validate.field).int32.example = 3,
+    (buf.validate.field).int32.example = 5,
+    (buf.validate.field).int32.example = 7,
+    (buf.validate.field).int32.example = 9
+  ];
 }
 
 /**
