@@ -31,31 +31,10 @@ service CommsService {
 // GetCommsStatusResponse represents the current communication status of the OpenMANET node.
 message GetCommsStatusResponse {
   // The active talkgroup the node is currently participating in.
-  TalkGroup active_talkgroup = 1;
+  int32 active_talkgroup = 1;
 
   // Available talkgroups that the node can join.
-  repeated TalkGroup available_talkgroups = 2;
-}
-
-// TalkGroup represents a logical grouping for multicast communication.
-// It maps a talk group number to a specific multicast address and port,
-// enabling group-based messaging within the OpenMANET network.
-//
-// Talk group numbers are constrained to the range [0, 10], where each
-// value corresponds to a unique multicast address and port combination.
-message TalkGroup {
-  // The talk group number, which corresponds to a specific multicast address and port.
-  int32 talkgroup = 1 [
-    (buf.validate.field).int32 = {
-      gte: 0
-      lte: 10
-    },
-    (buf.validate.field).int32.example = 1,
-    (buf.validate.field).int32.example = 3,
-    (buf.validate.field).int32.example = 5,
-    (buf.validate.field).int32.example = 7,
-    (buf.validate.field).int32.example = 9
-  ];
+  repeated int32 available_talkgroups = 2;
 }
 
 // JoinTalkGroupRequest is the request message for joining a multicast talk group.
