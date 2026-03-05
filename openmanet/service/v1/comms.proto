@@ -50,8 +50,8 @@ message GetCommsStatusResponse {
 // TalkGroupState is a read-only snapshot of the runtime send/receive direction
 // toggles for a single configured talkgroup port.
 message TalkGroupState {
-  // 1-based channel number identifying this talkgroup.
-  int32 channel = 1;
+  // 1-based talkgroup number identifying this talkgroup.
+  int32 talkgroup = 1;
 
   // Multicast address for this talkgroup.
   string address = 2;
@@ -126,7 +126,9 @@ message SetSendTalkGroupRequest {
     },
     (buf.validate.field).int32.example = 1,
     (buf.validate.field).int32.example = 3,
-    (buf.validate.field).int32.example = 5
+    (buf.validate.field).int32.example = 5,
+    (buf.validate.field).int32.example = 7,
+    (buf.validate.field).int32.example = 9
   ];
 
   // Whether RTP transmission should be enabled on this talkgroup.
@@ -134,7 +136,13 @@ message SetSendTalkGroupRequest {
 }
 
 // SetSendTalkGroupResponse is returned after a SetSendTalkGroup request.
-message SetSendTalkGroupResponse {}
+message SetSendTalkGroupResponse {
+  // Indicates whether the request to join the talkgroup was successful.
+  bool success = 1;
+
+  // Optional message providing additional information about the join operation.
+  string message = 2;
+}
 
 // SetReceiveTalkGroupRequest enables or disables RTP reception on the talkgroup
 // identified by its 1-based channel number.
@@ -147,7 +155,9 @@ message SetReceiveTalkGroupRequest {
     },
     (buf.validate.field).int32.example = 1,
     (buf.validate.field).int32.example = 3,
-    (buf.validate.field).int32.example = 5
+    (buf.validate.field).int32.example = 5,
+    (buf.validate.field).int32.example = 7,
+    (buf.validate.field).int32.example = 9
   ];
 
   // Whether RTP reception should be enabled on this talkgroup.
@@ -155,4 +165,10 @@ message SetReceiveTalkGroupRequest {
 }
 
 // SetReceiveTalkGroupResponse is returned after a SetReceiveTalkGroup request.
-message SetReceiveTalkGroupResponse {}
+message SetReceiveTalkGroupResponse {
+  // Indicates whether the request to join the talkgroup was successful.
+  bool success = 1;
+
+  // Optional message providing additional information about the join operation.
+  string message = 2;
+}
