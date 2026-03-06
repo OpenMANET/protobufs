@@ -24,9 +24,6 @@ service CommsService {
   // Retrieves the current communication status of the OpenMANET service.
   rpc GetCommsStatus(google.protobuf.Empty) returns (GetCommsStatusResponse);
 
-  // Joins the specified talkgroup for communication.
-  rpc JoinTalkGroup(JoinTalkGroupRequest) returns (JoinTalkGroupResponse);
-
   // Enables or disables RTP transmission on the specified talkgroup.
   rpc SetSendTalkGroup(SetSendTalkGroupRequest) returns (SetSendTalkGroupResponse);
 
@@ -64,55 +61,6 @@ message TalkGroupState {
 
   // Whether RTP reception is currently enabled on this talkgroup.
   bool receive_enabled = 5;
-}
-
-// JoinTalkGroupRequest is the request message for joining a multicast talk group.
-//
-// A talk group represents a multicast communication channel identified by an
-// IPv4 multicast address and a UDP port number. All talk groups share the same
-// multicast address and are distinguished by port, so switching groups only
-// requires rebinding sockets (no IGMP leave/join overhead).
-//
-// Example:
-//   JoinTalkGroupRequest{
-//     talkgroup: 1
-//   }
-message JoinTalkGroupRequest {
-  // The talk group number to join. This corresponds to a specific multicast
-  // address and port.
-  int32 talkgroup = 1 [
-    (buf.validate.field).int32 = {
-      gte: 0
-      lte: 10
-    },
-    (buf.validate.field).int32.example = 1,
-    (buf.validate.field).int32.example = 3,
-    (buf.validate.field).int32.example = 5,
-    (buf.validate.field).int32.example = 7,
-    (buf.validate.field).int32.example = 9
-  ];
-}
-
-/**
- * JoinTalkGroupResponse is the response message returned after a request
- * to join a talk group has been processed.
- *
- * Fields:
- *   - success: A boolean flag indicating whether the request to join the
- *              talk group was successful. A value of `true` means the
- *              operation succeeded, while `false` indicates a failure.
- *
- *   - message: An optional human-readable string providing additional
- *              context or information about the join operation. This may
- *              include error details if the operation was unsuccessful,
- *              or a confirmation message if successful.
- */
-message JoinTalkGroupResponse {
-  // Indicates whether the request to join the talkgroup was successful.
-  bool success = 1;
-
-  // Optional message providing additional information about the join operation.
-  string message = 2;
 }
 
 // SetSendTalkGroupRequest enables or disables RTP transmission on the talkgroup
