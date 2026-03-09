@@ -14,12 +14,9 @@ import "google/protobuf/empty.proto";
 //
 // Example usage:
 //   - Call GetCommsStatus to monitor the current state of communications.
-//   - Call JoinTalkGroup with a JoinTalkGroupRequest to join a specific talkgroup.
 //
 // Note: GetCommsStatus takes no request parameters (google.protobuf.Empty) and
 // returns a GetCommsStatusResponse containing the current communication status.
-// JoinTalkGroup requires a JoinTalkGroupRequest and returns a JoinTalkGroupResponse
-// indicating the result of the join operation.
 service CommsService {
   // Retrieves the current communication status of the OpenMANET service.
   rpc GetCommsStatus(google.protobuf.Empty) returns (GetCommsStatusResponse);
