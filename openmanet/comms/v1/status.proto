@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package openmanet.comms.v1;
 
-import "talkgroup.proto";
+import "openmanet/comms/v1/talkgroup.proto";
 
 // GetCommsStatusResponse represents the current communication status of the OpenMANET node.
 message GetCommsStatusResponse {
