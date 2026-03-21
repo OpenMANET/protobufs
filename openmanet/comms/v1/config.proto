@@ -2,6 +2,12 @@ syntax = "proto3";
 
 package openmanet.comms.v1;
 
+import "google/protobuf/descriptor.proto";
+
+extend google.protobuf.EnumValueOptions {
+  optional string string_name = 123456789;
+}
+
 enum ControlSource {
   CONTROL_SOURCE_CM108 = 0 [
     (string_name) = "cm108"
