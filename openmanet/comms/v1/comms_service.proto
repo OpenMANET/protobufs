@@ -4,10 +4,10 @@ package openmanet.comms.v1;
 
 import "google/protobuf/empty.proto";
 
-import "config.proto";
-import "comms.proto";
-import "talkgroup.proto";
-import "status.proto";
+import "openmanet/comms/v1/config.proto";
+import "openmanet/comms/v1/comms.proto";
+import "openmanet/comms/v1/talkgroup.proto";
+import "openmanet/comms/v1/status.proto";
 
 // CommsService exposes control and real-time audio APIs between web clients
 // and the OpenMANET communications subsystem.
