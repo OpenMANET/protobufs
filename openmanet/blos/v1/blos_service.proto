@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package openmanet.blos.v1;
+
+import "google/protobuf/empty.proto";
+import "openmanet/blos/v1/blos.proto";
+
+// BLOSService provides methods to manage and retrieve the status of the Beyond Line of Sight (BLOS) subsystem within the OpenMANET system.
+service BLOSService {
+  // GetBLOSStatus retrieves the current status of the BLOS subsystem, including whether it is enabled and any relevant status messages.
+  rpc GetBLOSStatus(google.protobuf.Empty) returns (GetBLOSStatusResponse) {}
+  // UpdateBLOSConfig updates the configuration of the BLOS subsystem, including enabling or disabling it and setting authentication keys.
+  rpc UpdateBLOSConfig(UpdateBLOSConfigRequest) returns (UpdateBLOSConfigResponse) {}
+}

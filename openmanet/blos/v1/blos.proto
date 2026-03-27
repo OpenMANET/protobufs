@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package openmanet.blos.v1;
+
+message GetBLOSStatusResponse {
+  // Indicates whether the BLOS subsystem is currently enabled.
+  bool blos_enabled = 1;
+
+  // Optional message providing additional information about the BLOS status.
+  optional string message = 2;
+}
+
+message UpdateBLOSConfigRequest {
+  // Whether to enable or disable the BLOS subsystem.
+  bool enable_blos = 1;
+
+  // Authentication key for tailscale or headscale.
+  // required
+  string auth_key = 2;
+
+  // Optional URL for the login server (e.g., headscale). If not provided, a default will be used.
+  optional string login_server_url = 3;
+}
+
+message UpdateBLOSConfigResponse {
+  // Indicates whether the update was successful.
+  bool success = 1;
+
+  // Optional message providing additional information about the update result.
+  optional string message = 2;
+}
