@@ -2,23 +2,19 @@ syntax = "proto3";
 
 package openmanet.comms.v1;
 
-import "google/protobuf/descriptor.proto";
-
-extend google.protobuf.EnumValueOptions {
-  optional string string_name = 123456789;
-}
+import "openmanet/common/v1/options.proto";
 
 enum ControlSource {
   CONTROL_SOURCE_CM108 = 0 [
-    (string_name) = "cm108"
+    (openmanet.common.v1.string_name) = "cm108"
   ];
 
   CONTROL_SOURCE_NANOPTT = 1 [
-    (string_name) = "nanoptt"
+    (openmanet.common.v1.string_name) = "nanoptt"
   ];
 
   CONTROL_SOURCE_WEB = 2 [
-    (string_name) = "web"
+    (openmanet.common.v1.string_name) = "web"
   ];
 }
 
