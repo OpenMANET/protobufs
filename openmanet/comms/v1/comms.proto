@@ -33,4 +33,3 @@ message StreamAudioTxResponse {
 
 // StreamAudioRxRequest initiates a server-streaming RX audio session.
 message StreamAudioRxRequest {}
-

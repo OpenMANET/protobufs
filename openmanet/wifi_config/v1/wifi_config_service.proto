@@ -4,7 +4,6 @@ package openmanet.wifi_config.v1;
 
 import "buf/validate/validate.proto";
 import "google/protobuf/empty.proto";
-
 import "openmanet/wifi_config/v1/wifi_config.proto";
 
 // WifiConfigService provides methods to retrieve and configure wireless

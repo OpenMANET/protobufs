@@ -3,11 +3,10 @@ syntax = "proto3";
 package openmanet.comms.v1;
 
 import "google/protobuf/empty.proto";
-
-import "openmanet/comms/v1/config.proto";
 import "openmanet/comms/v1/comms.proto";
-import "openmanet/comms/v1/talkgroup.proto";
+import "openmanet/comms/v1/config.proto";
 import "openmanet/comms/v1/status.proto";
+import "openmanet/comms/v1/talkgroup.proto";
 
 // CommsService exposes control and real-time audio APIs between web clients
 // and the OpenMANET communications subsystem.

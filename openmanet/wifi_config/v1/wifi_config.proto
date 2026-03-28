@@ -4,159 +4,92 @@ package openmanet.wifi_config.v1;
 
 import "buf/validate/validate.proto";
 import "google/protobuf/duration.proto";
-
 import "openmanet/common/v1/options.proto";
 
 // WifiBand identifies the frequency band of a wireless radio.
 enum WifiBand {
   WIFI_BAND_UNSPECIFIED = 0;
 
-  WIFI_BAND_2G = 1 [
-    (openmanet.common.v1.string_name) = "2g"
-  ];
+  WIFI_BAND_2G = 1 [(openmanet.common.v1.string_name) = "2g"];
 
-  WIFI_BAND_5G = 2 [
-    (openmanet.common.v1.string_name) = "5g"
-  ];
+  WIFI_BAND_5G = 2 [(openmanet.common.v1.string_name) = "5g"];
 
-  WIFI_BAND_6G = 3 [
-    (openmanet.common.v1.string_name) = "6g"
-  ];
+  WIFI_BAND_6G = 3 [(openmanet.common.v1.string_name) = "6g"];
 
-  WIFI_BAND_S1G = 4 [
-    (openmanet.common.v1.string_name) = "s1g"
-  ];
+  WIFI_BAND_S1G = 4 [(openmanet.common.v1.string_name) = "s1g"];
 
-  WIFI_BAND_60G = 5 [
-    (openmanet.common.v1.string_name) = "60g"
-  ];
+  WIFI_BAND_60G = 5 [(openmanet.common.v1.string_name) = "60g"];
 }
 
 // WifiMode identifies the operating mode of a wireless interface.
 enum WifiMode {
   WIFI_MODE_UNSPECIFIED = 0;
 
-  WIFI_MODE_AP = 1 [
-    (openmanet.common.v1.string_name) = "ap"
-  ];
+  WIFI_MODE_AP = 1 [(openmanet.common.v1.string_name) = "ap"];
 
-  WIFI_MODE_MESH = 2 [
-    (openmanet.common.v1.string_name) = "mesh"
-  ];
+  WIFI_MODE_MESH = 2 [(openmanet.common.v1.string_name) = "mesh"];
 
-  WIFI_MODE_STA = 3 [
-    (openmanet.common.v1.string_name) = "sta"
-  ];
+  WIFI_MODE_STA = 3 [(openmanet.common.v1.string_name) = "sta"];
 
-  WIFI_MODE_ADHOC = 4 [
-    (openmanet.common.v1.string_name) = "adhoc"
-  ];
+  WIFI_MODE_ADHOC = 4 [(openmanet.common.v1.string_name) = "adhoc"];
 
-  WIFI_MODE_MONITOR = 5 [
-    (openmanet.common.v1.string_name) = "monitor"
-  ];
+  WIFI_MODE_MONITOR = 5 [(openmanet.common.v1.string_name) = "monitor"];
 }
 
 // WifiEncryption identifies the encryption method for a wireless interface.
 enum WifiEncryption {
   WIFI_ENCRYPTION_UNSPECIFIED = 0;
 
-  WIFI_ENCRYPTION_SAE = 1 [
-    (openmanet.common.v1.string_name) = "sae"
-  ];
+  WIFI_ENCRYPTION_SAE = 1 [(openmanet.common.v1.string_name) = "sae"];
 
-  WIFI_ENCRYPTION_PSK2 = 2 [
-    (openmanet.common.v1.string_name) = "psk2"
-  ];
+  WIFI_ENCRYPTION_PSK2 = 2 [(openmanet.common.v1.string_name) = "psk2"];
 
-  WIFI_ENCRYPTION_PSK = 3 [
-    (openmanet.common.v1.string_name) = "psk"
-  ];
+  WIFI_ENCRYPTION_PSK = 3 [(openmanet.common.v1.string_name) = "psk"];
 
-  WIFI_ENCRYPTION_PSK_MIXED = 4 [
-    (openmanet.common.v1.string_name) = "psk-mixed"
-  ];
+  WIFI_ENCRYPTION_PSK_MIXED = 4 [(openmanet.common.v1.string_name) = "psk-mixed"];
 
-  WIFI_ENCRYPTION_NONE = 5 [
-    (openmanet.common.v1.string_name) = "none"
-  ];
+  WIFI_ENCRYPTION_NONE = 5 [(openmanet.common.v1.string_name) = "none"];
 
-  WIFI_ENCRYPTION_OWE = 6 [
-    (openmanet.common.v1.string_name) = "owe"
-  ];
+  WIFI_ENCRYPTION_OWE = 6 [(openmanet.common.v1.string_name) = "owe"];
 }
 
 // WifiHTMode identifies the high-throughput / channel-width mode.
 enum WifiHTMode {
   WIFI_HT_MODE_UNSPECIFIED = 0;
 
-  WIFI_HT_MODE_NOHT = 1 [
-    (openmanet.common.v1.string_name) = "NOHT"
-  ];
+  WIFI_HT_MODE_NOHT = 1 [(openmanet.common.v1.string_name) = "NOHT"];
 
-  WIFI_HT_MODE_HT20 = 2 [
-    (openmanet.common.v1.string_name) = "HT20"
-  ];
+  WIFI_HT_MODE_HT20 = 2 [(openmanet.common.v1.string_name) = "HT20"];
 
-  WIFI_HT_MODE_HT40_MINUS = 3 [
-    (openmanet.common.v1.string_name) = "HT40-"
-  ];
+  WIFI_HT_MODE_HT40_MINUS = 3 [(openmanet.common.v1.string_name) = "HT40-"];
 
-  WIFI_HT_MODE_HT40_PLUS = 4 [
-    (openmanet.common.v1.string_name) = "HT40+"
-  ];
+  WIFI_HT_MODE_HT40_PLUS = 4 [(openmanet.common.v1.string_name) = "HT40+"];
 
-  WIFI_HT_MODE_HT40 = 5 [
-    (openmanet.common.v1.string_name) = "HT40"
-  ];
+  WIFI_HT_MODE_HT40 = 5 [(openmanet.common.v1.string_name) = "HT40"];
 
-  WIFI_HT_MODE_VHT20 = 6 [
-    (openmanet.common.v1.string_name) = "VHT20"
-  ];
+  WIFI_HT_MODE_VHT20 = 6 [(openmanet.common.v1.string_name) = "VHT20"];
 
-  WIFI_HT_MODE_VHT40 = 7 [
-    (openmanet.common.v1.string_name) = "VHT40"
-  ];
+  WIFI_HT_MODE_VHT40 = 7 [(openmanet.common.v1.string_name) = "VHT40"];
 
-  WIFI_HT_MODE_VHT80 = 8 [
-    (openmanet.common.v1.string_name) = "VHT80"
-  ];
+  WIFI_HT_MODE_VHT80 = 8 [(openmanet.common.v1.string_name) = "VHT80"];
 
-  WIFI_HT_MODE_VHT160 = 9 [
-    (openmanet.common.v1.string_name) = "VHT160"
-  ];
+  WIFI_HT_MODE_VHT160 = 9 [(openmanet.common.v1.string_name) = "VHT160"];
 
-  WIFI_HT_MODE_HE20 = 10 [
-    (openmanet.common.v1.string_name) = "HE20"
-  ];
+  WIFI_HT_MODE_HE20 = 10 [(openmanet.common.v1.string_name) = "HE20"];
 
-  WIFI_HT_MODE_HE40 = 11 [
-    (openmanet.common.v1.string_name) = "HE40"
-  ];
+  WIFI_HT_MODE_HE40 = 11 [(openmanet.common.v1.string_name) = "HE40"];
 
-  WIFI_HT_MODE_HE80 = 12 [
-    (openmanet.common.v1.string_name) = "HE80"
-  ];
+  WIFI_HT_MODE_HE80 = 12 [(openmanet.common.v1.string_name) = "HE80"];
 
-  WIFI_HT_MODE_HE160 = 13 [
-    (openmanet.common.v1.string_name) = "HE160"
-  ];
+  WIFI_HT_MODE_HE160 = 13 [(openmanet.common.v1.string_name) = "HE160"];
 
-  WIFI_HT_MODE_S1G_1MHZ = 14 [
-    (openmanet.common.v1.string_name) = "1 MHz"
-  ];
+  WIFI_HT_MODE_S1G_1MHZ = 14 [(openmanet.common.v1.string_name) = "1 MHz"];
 
-  WIFI_HT_MODE_S1G_2MHZ = 15 [
-    (openmanet.common.v1.string_name) = "2 MHz"
-  ];
+  WIFI_HT_MODE_S1G_2MHZ = 15 [(openmanet.common.v1.string_name) = "2 MHz"];
 
-  WIFI_HT_MODE_S1G_4MHZ = 16 [
-    (openmanet.common.v1.string_name) = "4 MHz"
-  ];
+  WIFI_HT_MODE_S1G_4MHZ = 16 [(openmanet.common.v1.string_name) = "4 MHz"];
 
-  WIFI_HT_MODE_S1G_8MHZ = 17 [
-    (openmanet.common.v1.string_name) = "8 MHz"
-  ];
+  WIFI_HT_MODE_S1G_8MHZ = 17 [(openmanet.common.v1.string_name) = "8 MHz"];
 }
 
 // Radio identifies a physical wireless radio on the device.
@@ -232,9 +165,7 @@ message RadioSettings {
   ];
 
   // Passphrase / pre-shared key. Write-only: never returned on reads.
-  optional string password = 3 [
-    (buf.validate.field).string.max_len = 63
-  ];
+  optional string password = 3 [(buf.validate.field).string.max_len = 63];
 
   // Channel number as a string (e.g. "1", "42", "auto").
   string channel = 4 [

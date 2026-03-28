@@ -3,9 +3,8 @@ syntax = "proto3";
 package openmanet.network_interface.v1;
 
 import "google/protobuf/empty.proto";
-
-import "openmanet/network_interface/v1/interface.proto";
 import "openmanet/network_interface/v1/dhcp.proto";
+import "openmanet/network_interface/v1/interface.proto";
 
 // NetworkInterfaceService provides read-only access to network interface
 // configuration, status, and DHCP information on the OpenMANET system.
