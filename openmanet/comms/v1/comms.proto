@@ -15,9 +15,19 @@ message SendPTTEventResponse {
   bool success = 1;
 }
 
-// WebAudioFrame carries a single Opus-encoded audio frame (48 kHz, mono,
-// 20 ms) between the web client and the server.
-message WebAudioFrame {
+// StreamAudioTxRequest carries a single Opus-encoded audio frame (48 kHz,
+// mono, 20 ms) from the web client to the server for mesh transmission.
+message StreamAudioTxRequest {
+  // Raw Opus-encoded frame bytes.
+  bytes opus_data = 1;
+
+  // Monotonic sequence number for ordering and loss detection.
+  uint32 sequence = 2;
+}
+
+// StreamAudioRxResponse carries a single Opus-encoded audio frame (48 kHz,
+// mono, 20 ms) from the server to the web client.
+message StreamAudioRxResponse {
   // Raw Opus-encoded frame bytes.
   bytes opus_data = 1;
 

@@ -66,9 +66,9 @@ service CommsService {
   // StreamAudioTx is a client-streaming RPC: the web client streams
   // Opus-encoded audio frames to the server for transmission to the mesh.
   // The server returns a summary when the client closes the stream.
-  rpc StreamAudioTx(stream WebAudioFrame) returns (StreamAudioTxResponse);
+  rpc StreamAudioTx(stream StreamAudioTxRequest) returns (StreamAudioTxResponse);
 
   // StreamAudioRx is a server-streaming RPC: the server streams
   // Opus-encoded audio frames received from the mesh back to the web client.
-  rpc StreamAudioRx(StreamAudioRxRequest) returns (stream WebAudioFrame);
+  rpc StreamAudioRx(StreamAudioRxRequest) returns (stream StreamAudioRxResponse);
 }
