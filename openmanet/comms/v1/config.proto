@@ -5,17 +5,11 @@ package openmanet.comms.v1;
 import "openmanet/common/v1/options.proto";
 
 enum ControlSource {
-  CONTROL_SOURCE_CM108 = 0 [
-    (openmanet.common.v1.string_name) = "cm108"
-  ];
+  CONTROL_SOURCE_OPENVLM = 0 [(openmanet.common.v1.string_name) = "openvlm"];
 
-  CONTROL_SOURCE_NANOPTT = 1 [
-    (openmanet.common.v1.string_name) = "nanoptt"
-  ];
+  CONTROL_SOURCE_NANOPTT = 1 [(openmanet.common.v1.string_name) = "nanoptt"];
 
-  CONTROL_SOURCE_WEB = 2 [
-    (openmanet.common.v1.string_name) = "web"
-  ];
+  CONTROL_SOURCE_WEB = 2 [(openmanet.common.v1.string_name) = "web"];
 }
 
 // GetCommsConfigResponse is used to request the current communications configuration.
