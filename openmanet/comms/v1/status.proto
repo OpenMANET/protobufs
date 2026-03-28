@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package openmanet.comms.v1;
+
+import "openmanet/comms/v1/talkgroup.proto";
+
+// GetCommsStatusResponse represents the current communication status of the OpenMANET node.
+message GetCommsStatusResponse {
+  // The active talkgroup the node is currently participating in.
+  int32 active_talkgroup = 1;
+
+  // Available talkgroups that the node can join.
+  repeated int32 available_talkgroups = 2;
+
+  // Per-port direction state for all configured talkgroups. Empty when the
+  // comms subsystem is not running.
+  repeated TalkGroupState talkgroup_states = 3;
+}
