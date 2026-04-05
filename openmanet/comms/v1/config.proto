@@ -2,8 +2,8 @@ syntax = "proto3";
 
 package openmanet.comms.v1;
 
-import "openmanet/common/v1/options.proto";
 import "buf/validate/validate.proto";
+import "openmanet/common/v1/options.proto";
 
 enum ControlSource {
   CONTROL_SOURCE_UNSPECIFIED = 0;
