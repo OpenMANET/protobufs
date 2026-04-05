@@ -3,6 +3,7 @@ syntax = "proto3";
 package openmanet.comms.v1;
 
 import "openmanet/common/v1/options.proto";
+import "buf/validate/validate.proto";
 
 enum ControlSource {
   CONTROL_SOURCE_UNSPECIFIED = 0;
@@ -20,6 +21,8 @@ message GetCommsConfigResponse {
   bool comms_enabled = 1;
   // The source of control for the comms subsystem.
   ControlSource control_source = 2;
+  // Operator callsign attached to outgoing RTP packets (max 12 ASCII characters).
+  string callsign = 3 [(buf.validate.field) = {max_len: 12}];
 }
 
 // UpdateCommsConfigRequest is used to update the communications configuration.
@@ -28,6 +31,9 @@ message UpdateCommsConfigRequest {
   bool enable_comms = 1;
   // The source of control for the comms subsystem.
   ControlSource control_source = 2;
+  // Operator callsign attached to outgoing RTP packets (max 12 ASCII characters).
+  // Truncated server-side if longer than 12 characters.
+  string callsign = 3 [(buf.validate.field) = {max_len: 12}];
 }
 
 // UpdateCommsConfigResponse is returned after an UpdateCommsConfig request.

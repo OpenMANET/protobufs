@@ -21,6 +21,9 @@ message TalkGroupState {
 
   // Whether RTP reception is currently enabled on this talkgroup.
   bool receive_enabled = 5;
+
+  // Callsign last received from a remote peer on this talkgroup.
+  string remote_callsign = 6;
 }
 
 // SetSendTalkGroupRequest enables or disables RTP transmission on the talkgroup
