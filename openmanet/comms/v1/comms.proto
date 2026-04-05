@@ -33,6 +33,10 @@ message StreamAudioRxResponse {
 
   // Monotonic sequence number for ordering and loss detection.
   uint32 sequence = 2;
+
+  // Callsign of the remote peer whose audio this frame belongs to.
+  // Empty if the sender did not include a callsign extension.
+  string callsign = 3;
 }
 
 // StreamAudioTxResponse is returned when the client closes the TX stream.

@@ -15,4 +15,7 @@ message GetCommsStatusResponse {
   // Per-port direction state for all configured talkgroups. Empty when the
   // comms subsystem is not running.
   repeated TalkGroupState talkgroup_states = 3;
+
+  // The local operator callsign currently configured.
+  string callsign = 4;
 }
