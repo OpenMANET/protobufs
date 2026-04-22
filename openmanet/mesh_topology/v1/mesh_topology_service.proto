@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package openmanet.mesh_topology.v1;
 
+import "buf/validate/validate.proto";
+import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
 import "openmanet/mesh_topology/v1/mesh_topology.proto";
 
@@ -14,9 +16,60 @@ service MeshTopologyService {
   // returns a CodeFailedPrecondition error when batadv-vis cannot gather
   // data (for example, the local alfred server is not running), and a
   // CodeInternal error on unexpected failures.
-  rpc GetMeshTopology(google.protobuf.Empty) returns (GetMeshTopologyResponse);
+  rpc GetMeshTopology(google.protobuf.Empty) returns (GetMeshTopologyResponse) {}
+
+  // GetMeshTopologyDelta returns summary churn metrics over a recent
+  // time window derived from successive topology snapshots maintained
+  // by the MeshTopologyService. Returns CodeFailedPrecondition when the
+  // delta tracker is not running (e.g. batadv-vis unavailable at
+  // startup) and CodeInternal on unexpected failures.
+  rpc GetMeshTopologyDelta(GetMeshTopologyDeltaRequest) returns (GetMeshTopologyDeltaResponse) {}
 }
 
+// GetMeshTopologyResponse carries a single mesh-topology snapshot.
 message GetMeshTopologyResponse {
+  // topology is the snapshot gathered from alfred/batadv-vis.
   MeshTopology topology = 1;
+}
+
+// GetMeshTopologyDeltaRequest specifies the look-back window over which
+// churn metrics are aggregated. The server clamps the window to the
+// amount of history it has; see actual_window in the response.
+message GetMeshTopologyDeltaRequest {
+  // window is the look-back duration for computing deltas. Bounded to
+  // [1s, 300s]. When unset or zero, the server defaults to 60s.
+  google.protobuf.Duration window = 1 [(buf.validate.field).duration = {
+    gte: {seconds: 1}
+    lte: {seconds: 300}
+  }];
+}
+
+// GetMeshTopologyDeltaResponse carries aggregated mesh-network churn
+// metrics over the requested look-back window. All counters are
+// non-negative integers.
+message GetMeshTopologyDeltaResponse {
+  // routes_added is the number of new (router_mac, neighbor_mac) edges
+  // observed across sample boundaries in the window.
+  uint32 routes_added = 1;
+
+  // routes_lost is the number of edges that disappeared across sample
+  // boundaries in the window.
+  uint32 routes_lost = 2;
+
+  // gateway_changes is the number of times the set of nodes acting as
+  // batman-adv gateways changed across sample boundaries. Each
+  // add-or-remove event counts once.
+  uint32 gateway_changes = 3;
+
+  // reconverge is the wall-clock span from the first non-zero-delta
+  // sample in the window to the first subsequent zero-delta sample. A
+  // value equal to actual_window indicates the mesh did not stabilize
+  // within the window.
+  google.protobuf.Duration reconverge = 4;
+
+  // actual_window is the portion of the requested window that the
+  // server had samples for. On daemon cold-start this may be less than
+  // the requested window; clients should render metrics as unavailable
+  // when actual_window is near zero.
+  google.protobuf.Duration actual_window = 5;
 }
