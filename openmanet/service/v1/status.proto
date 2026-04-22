@@ -20,6 +20,14 @@ message ServiceStatus {
 
   // Current position of the node.
   Position position = 5;
+
+  // selected_gateway_mac is the originator MAC of the batman-adv gateway
+  // currently marked as "best" on this node (i.e. `batctl gwl` best row).
+  // Empty when batman-adv has no gateways announced on the tailnet, when
+  // this node runs in server mode and is itself the gateway, or when
+  // `batctl gwj` fails. The MAC can be cross-referenced with the mesh
+  // topology node list to resolve a hostname / IP for display.
+  string selected_gateway_mac = 6;
 }
 
 // Position represents the geographical position of the node if available.
