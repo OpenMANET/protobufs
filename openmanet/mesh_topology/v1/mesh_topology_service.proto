@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package openmanet.mesh_topology.v1;
+
+import "google/protobuf/empty.proto";
+import "openmanet/mesh_topology/v1/mesh_topology.proto";
+
+// MeshTopologyService exposes the full mesh network topology gathered by
+// alfred (via batadv-vis -f jsondoc). The response mirrors the jsondoc
+// structure with MAC-based hostname enrichment and, where available,
+// per-edge signal strength for the local node's radios.
+service MeshTopologyService {
+  // GetMeshTopology returns a snapshot of the current mesh topology. It
+  // returns a CodeFailedPrecondition error when batadv-vis cannot gather
+  // data (for example, the local alfred server is not running), and a
+  // CodeInternal error on unexpected failures.
+  rpc GetMeshTopology(google.protobuf.Empty) returns (GetMeshTopologyResponse);
+}
+
+message GetMeshTopologyResponse {
+  MeshTopology topology = 1;
+}
