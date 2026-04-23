@@ -43,6 +43,10 @@ message MeshEdge {
   // signal_average is the averaged signal strength in dBm for the same
   // station entry as signal. Zero when unknown.
   int32 signal_average = 6;
+
+  // router_hostname is the friendly name of router_mac from
+  // /tmp/bat-hosts (e.g. "BCM2711-97d6_wlan0"). Empty if unknown.
+  string router_hostname = 7;
 }
 
 // MeshNode represents a single mesh node as seen by batadv-vis. The primary
