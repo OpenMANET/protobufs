@@ -4,74 +4,100 @@ package openmanet.mesh_topology.v1;
 
 import "google/protobuf/timestamp.proto";
 
-// MeshOriginator is one row of the local batman-adv originator table: an
-// originator we can reach and the local interface / next hop we send through
-// to reach it. Only best-route entries are surfaced — batctl emits multiple
-// candidate rows per originator but just one is the selected forwarding
-// state, and that's the only one that makes sense to visualize.
-message MeshOriginator {
-  // orig_mac is the MAC of the reachable originator (its bat0 address).
-  string orig_mac = 1;
+// MeshNode is one physical node in the mesh, as reported by alfred /
+// batadv-vis -f jsondoc and enriched with /tmp/bat-hosts metadata plus
+// self-originator overlay data.
+message MeshNode {
+  // mac is the node's primary MAC (its bat0 address from the vis payload).
+  string mac = 1;
 
-  // orig_hostname is the friendly name of orig_mac from /tmp/bat-hosts
-  // (e.g. "BCM2711-97d6_bat0"). Empty when bat-hosts has no entry.
-  string orig_hostname = 2;
+  // secondary_macs are the other MACs this node publishes (one per extra
+  // hard interface). Kept so edges keyed on a secondary MAC can be
+  // resolved back to a single MeshNode.
+  repeated string secondary_macs = 2;
 
-  // next_hop_mac is the MAC of the peer our local node forwards through
-  // to reach the originator. Equal to orig_mac when the originator is a
-  // direct neighbor (one-hop).
-  string next_hop_mac = 3;
+  // hostname is the node's base hostname from /tmp/bat-hosts, with the
+  // "_<iface>" suffix stripped. Empty when bat-hosts has no entry.
+  string hostname = 3;
 
-  // next_hop_hostname is the friendly name of next_hop_mac from
-  // /tmp/bat-hosts. Empty when bat-hosts has no entry.
-  string next_hop_hostname = 4;
+  // segment is the rendering segment this node belongs to from the
+  // serving node's point of view: "local" when the serving node reaches
+  // it over a non-vxlan0 interface, "remote" when the best route is
+  // over vxlan0 (BLOS). Always "local" for the serving node itself.
+  string segment = 4;
 
-  // hard_ifname is the local interface that carries this route — e.g.
-  // "wlan0", "phy2-mesh0", or "vxlan0". The UI uses this to partition
-  // originators into local and remote (BLOS) segments.
-  string hard_ifname = 5;
+  // client_count is the number of non-mesh MACs attached to this node
+  // (the length of the vis "clients" array — transtable entries such
+  // as laptops or phones bridged via ethernet or AP).
+  int32 client_count = 5;
 
-  // tq is the batman-adv transmit quality for BATMAN_IV, in the range
-  // 0–255 (higher is better). Zero when the algorithm is BATMAN_V or
-  // when the metric is unknown.
-  int32 tq = 6;
+  // hops_from_self is the number of forwarding hops from the serving
+  // node to this node, as derived from the serving node's originator
+  // table. 0 for the serving node itself; 99 for "unknown".
+  int32 hops_from_self = 6;
 
-  // throughput is the BATMAN_V link throughput in kbps (higher is
-  // better). Zero when the algorithm is BATMAN_IV.
-  double throughput = 7;
+  // my_hard_ifname is the local interface the serving node uses to
+  // reach this node (e.g. "wlan0", "vxlan0"). Empty when the serving
+  // node has no route to this node in its originator table.
+  string my_hard_ifname = 7;
 
-  // last_seen_ms is the number of milliseconds since the local daemon
-  // last heard an originator message from this peer.
-  int32 last_seen_ms = 8;
-
-  // hops is the number of forwarding steps from the local node to the
-  // originator — 1 for a direct neighbor. Derived by walking the
-  // best_next_hop chain. 99 is a sentinel for "couldn't resolve".
-  int32 hops = 9;
+  // is_self is true when this node is the serving node.
+  bool is_self = 8;
 }
 
-// MeshTopology is a snapshot of the local batman-adv originator table,
-// enriched with hostnames from /tmp/bat-hosts.
+// MeshEdge is one link in the mesh, canonicalized so A↔B appears once
+// regardless of whether vis reported it from A's or B's perspective.
+message MeshEdge {
+  // from_mac is the lexically-smaller endpoint MAC (lowercased).
+  string from_mac = 1;
+
+  // to_mac is the lexically-larger endpoint MAC (lowercased).
+  string to_mac = 2;
+
+  // metric is the raw link metric reported by vis. For BATMAN_IV this
+  // is 255/TQ (lower is better). For BATMAN_V it is throughput-derived
+  // (see the algorithm field on the enclosing MeshTopology). Zero when
+  // vis emitted no parseable metric.
+  double metric = 3;
+
+  // blos is true when the two endpoints sit in different segments —
+  // i.e. the edge bridges a BLOS (vxlan0) tunnel.
+  bool blos = 4;
+
+  // on_my_path is true when this edge appears as (orig, best_next_hop)
+  // in the serving node's originator table — i.e. the serving node
+  // forwards traffic over this link.
+  bool on_my_path = 5;
+}
+
+// MeshTopology is the full mesh graph: every reachable node's neighbor
+// set as published to alfred by every node's batadv-vis -s, enriched
+// with bat-hosts hostnames and the serving node's own routing overlay.
 message MeshTopology {
-  // self_mac is the MAC of the local bat0 interface. Empty when the
-  // interface is not yet present (batman-adv module still loading, etc.).
+  // self_mac is the MAC of the serving node's bat0 interface. Empty
+  // when the interface is not yet present (batman-adv module loading).
   string self_mac = 1;
 
-  // self_hostname is the base hostname of the local node — the bat-hosts
-  // entry for self_mac with its "_bat0" suffix stripped. Empty when
+  // self_hostname is the base hostname of the serving node — its
+  // bat-hosts entry with the "_bat0" suffix stripped. Empty when
   // bat-hosts has no entry for self_mac.
   string self_hostname = 2;
 
-  // algorithm is the batman-adv routing algorithm as surfaced by the
-  // originator table: "BATMAN_IV" when TQ values are present,
-  // "BATMAN_V" when throughput values are present, empty when neither.
+  // algorithm is the batman-adv routing algorithm as reported by
+  // batadv-vis: "BATMAN_IV" for code 4, "BATMAN_V" for code 15, empty
+  // otherwise. Determines how the per-edge metric field should be
+  // formatted in the UI.
   string algorithm = 3;
 
-  // originators is the set of best-route rows from the local originator
-  // table.
-  repeated MeshOriginator originators = 4;
+  // nodes is the set of physical mesh nodes — one entry per primary
+  // MAC. Sorted (is_self desc, hostname asc) for stable rendering.
+  repeated MeshNode nodes = 4;
 
-  // collected_at is the wall-clock time the snapshot was produced on the
-  // serving node.
-  google.protobuf.Timestamp collected_at = 5;
+  // edges is the canonical set of mesh links. Sorted (blos asc,
+  // from_mac asc, to_mac asc) for stable rendering.
+  repeated MeshEdge edges = 5;
+
+  // collected_at is the wall-clock time the snapshot was produced on
+  // the serving node.
+  google.protobuf.Timestamp collected_at = 6;
 }
