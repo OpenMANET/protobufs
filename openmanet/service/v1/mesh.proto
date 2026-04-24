@@ -20,7 +20,10 @@ message MeshNeighbor {
   // Last seen in miliseconds
   int64 last_seen = 5;
 
-  // throughput to the neighbor node.
+  // Throughput to the neighbor node in bits per second. Derived from
+  // the wifi station's current transmit bitrate, overridden (in the
+  // same unit) with batman-adv's reported link throughput when the
+  // neighbor is present in `batctl nj`.
   int32 throughput = 6;
 }
 
