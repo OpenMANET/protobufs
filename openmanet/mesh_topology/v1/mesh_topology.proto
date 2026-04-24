@@ -43,6 +43,13 @@ message MeshNode {
 
   // is_self is true when this node is the serving node.
   bool is_self = 8;
+
+  // remote_gateway_mac is the MAC of the direct BLOS neighbor (vxlan0)
+  // through which the serving node reaches this remote node. Empty for
+  // local-segment nodes. Remote nodes sharing the same gateway form one
+  // remote mesh segment in the UI; distinct gateways produce distinct
+  // segments.
+  string remote_gateway_mac = 9;
 }
 
 // MeshEdge is one link in the mesh, canonicalized so A↔B appears once
