@@ -105,6 +105,12 @@ message SatelliteStatus {
   // satellites contains detailed information for each satellite currently
   // visible to the receiver.
   repeated Satellite satellites = 3;
+
+  // last_update is the UTC timestamp of the most recent SKY report that
+  // carried constellation detail. Partial SKY reports that only refresh
+  // DOP values do not advance this timestamp, so it reflects the freshness
+  // of the sky-in-view data rather than liveness of the gpsd link.
+  google.protobuf.Timestamp last_update = 4;
 }
 
 // GNSSSettings holds the top-level GNSS receiver configuration that
