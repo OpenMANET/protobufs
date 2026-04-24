@@ -23,4 +23,13 @@ enum DataType {
      Node data type
   */
   DATA_TYPE_NODE = 102;
+
+  /*
+     Mesh neighbors data type. Published by every node every 15 s.
+     Payload: openmanet.network.v1.MeshNeighbors (see mesh_neighbors.proto).
+     Consumed by the serving node's mesh topology handler to classify
+     vxlan0-reached peers into the physical mesh of whichever publisher
+     hears them on a non-vxlan interface.
+  */
+  DATA_TYPE_MESH_NEIGHBORS = 103;
 }

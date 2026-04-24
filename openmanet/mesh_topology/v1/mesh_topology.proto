@@ -50,6 +50,12 @@ message MeshNode {
   // remote mesh segment in the UI; distinct gateways produce distinct
   // segments.
   string remote_gateway_mac = 9;
+
+  // gossip_stale is true when the mesh-neighbors gossip record for this
+  // node has not been refreshed within the snapshotter's StaleAge
+  // window, or when no gossip record exists at all. The UI dims stale
+  // hosts to signal that their topology data is aging.
+  bool gossip_stale = 10;
 }
 
 // MeshEdge is one link in the mesh, canonicalized so A↔B appears once
@@ -107,4 +113,22 @@ message MeshTopology {
   // collected_at is the wall-clock time the snapshot was produced on
   // the serving node.
   google.protobuf.Timestamp collected_at = 6;
+
+  // gossip_coverage reports how many mesh members are currently
+  // publishing MeshNeighbors gossip. Lets the UI show a "GOSSIP N/M"
+  // badge so operators can spot partial coverage.
+  GossipCoverage gossip_coverage = 7;
+}
+
+// GossipCoverage summarizes MeshNeighbors gossip participation across
+// the mesh at the serving node's most recent refresh.
+message GossipCoverage {
+  // published is the number of primary MACs for which a gossip record
+  // was present and not stale.
+  int32 published = 1;
+
+  // total is the number of primary MACs the serving node is aware of
+  // (from vis + originators). When published == total every mesh
+  // member is participating.
+  int32 total = 2;
 }
