@@ -26,10 +26,8 @@ message MeshNode {
   // over vxlan0 (BLOS). Always "local" for the serving node itself.
   string segment = 4;
 
-  // client_count is the number of non-mesh MACs attached to this node
-  // (the length of the vis "clients" array — transtable entries such
-  // as laptops or phones bridged via ethernet or AP).
-  int32 client_count = 5;
+  reserved 5;
+  reserved "client_count";
 
   // hops_from_self is the number of forwarding hops from the serving
   // node to this node, as derived from the serving node's originator
