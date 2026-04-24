@@ -56,6 +56,13 @@ message MeshNode {
   // window, or when no gossip record exists at all. The UI dims stale
   // hosts to signal that their topology data is aging.
   bool gossip_stale = 10;
+
+  // gossip_age_seconds is the age (in whole seconds) of the publisher's
+  // most recent gossip record for this node — the delta between the
+  // serving node's "now" and the payload's collected_at. -1 when no
+  // record exists or the publisher did not timestamp the payload. Unset
+  // (0) for self, which is always current.
+  int32 gossip_age_seconds = 11;
 }
 
 // MeshEdge is one link in the mesh, canonicalized so A↔B appears once
