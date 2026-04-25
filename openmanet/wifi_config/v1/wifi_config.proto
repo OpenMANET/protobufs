@@ -201,6 +201,9 @@ message RadioSettings {
 
   // Whether the radio is disabled.
   optional bool disabled = 9;
+
+  // Operating mode. UNSPECIFIED means "do not change" on updates.
+  WifiMode mode = 10;
 }
 
 // ConnectedClient represents an AP-connected wireless client.
