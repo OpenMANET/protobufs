@@ -1,0 +1,150 @@
+syntax = "proto3";
+
+package openmanet.sysupgrade.v1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "openmanet/sysupgrade/v1/sysupgrade.proto";
+
+// SysupgradeService exposes firmware upgrade discovery and execution to
+// the operator UI. All RPCs are unary except StreamUpgradeProgress.
+//
+// The intended workflow is:
+//   1. GetSystemInfo() to confirm the device is sysupgrade-capable and to
+//      identify the hardware (target + board_name).
+//   2. ListAvailableUpdates() to query GitHub for releases newer than
+//      the running firmware that have a matching asset for the local
+//      hardware. The first call (or any call with force_refresh=true)
+//      hits the GitHub API; subsequent calls serve the on-disk cache.
+//   3. (Optional) GetReleaseDetail() to fetch full release notes.
+//   4. StartUpgrade() to begin the asynchronous Download → Verify →
+//      Exec sequence. The call returns immediately; progress is
+//      observed via StreamUpgradeProgress() (preferred) or
+//      GetUpgradeStatus() polling.
+//   5. CancelUpgrade() before the sysupgrade binary is exec'd, if the
+//      operator changes their mind.
+//
+// Error codes:
+//   - InvalidArgument:    malformed request, mutually exclusive options.
+//   - FailedPrecondition: device not capable, no matching asset, etc.
+//   - DataLoss:           sha256 verification failed.
+//   - Unavailable:        GitHub fetch failed (network error or rate limit).
+//   - Internal:           local I/O or unexpected runtime error.
+service SysupgradeService {
+  // GetSystemInfo returns the running system metadata required to
+  // decide whether sysupgrade is possible and which firmware image
+  // matches the local hardware.
+  rpc GetSystemInfo(google.protobuf.Empty) returns (GetSystemInfoResponse);
+
+  // ListAvailableUpdates returns releases newer than the currently
+  // installed version that have an asset matching the local hardware.
+  // When force_refresh is true the GitHub API is contacted; otherwise
+  // the on-disk cache is used.
+  rpc ListAvailableUpdates(ListAvailableUpdatesRequest) returns (ListAvailableUpdatesResponse);
+
+  // GetReleaseDetail returns one release by tag, including the full
+  // release notes body. Reads from the cache populated by
+  // ListAvailableUpdates.
+  rpc GetReleaseDetail(GetReleaseDetailRequest) returns (GetReleaseDetailResponse);
+
+  // StartUpgrade kicks off the Download → Verify → Exec sequence. The
+  // call returns as soon as the in-flight goroutine is spawned. Errors
+  // returned here are preflight (busy, unknown current version,
+  // invalid options); all later errors arrive via the progress stream.
+  rpc StartUpgrade(StartUpgradeRequest) returns (StartUpgradeResponse);
+
+  // CancelUpgrade aborts an in-flight upgrade before sysupgrade has
+  // been exec'd. Returns FailedPrecondition once the binary has been
+  // launched.
+  rpc CancelUpgrade(google.protobuf.Empty) returns (CancelUpgradeResponse);
+
+  // GetUpgradeStatus returns a snapshot of the current upgrade state.
+  // Suitable for clients that cannot use StreamUpgradeProgress.
+  rpc GetUpgradeStatus(google.protobuf.Empty) returns (GetUpgradeStatusResponse);
+
+  // StreamUpgradeProgress streams progress events. The server emits the
+  // current snapshot first, then every state change until the client
+  // disconnects.
+  rpc StreamUpgradeProgress(google.protobuf.Empty) returns (stream StreamUpgradeProgressResponse);
+}
+
+// GetSystemInfoResponse wraps a SystemInfo so future fields can be added
+// alongside it without changing the RPC return type.
+message GetSystemInfoResponse {
+  SystemInfo info = 1;
+}
+
+// ListAvailableUpdatesRequest controls release discovery.
+message ListAvailableUpdatesRequest {
+  // ForceRefresh true causes the manager to fetch the GitHub releases
+  // index. False serves the on-disk cache when populated.
+  bool force_refresh = 1;
+
+  // IncludePrerelease true keeps GitHub-flagged pre-releases in the
+  // result set. False (the default) omits them.
+  bool include_prerelease = 2;
+}
+
+// ListAvailableUpdatesResponse carries the filtered list of upgrades.
+message ListAvailableUpdatesResponse {
+  // Updates is in descending order by release version (newest first).
+  repeated Update updates = 1;
+
+  // FetchedAt is when the underlying release list was last fetched
+  // from GitHub.
+  google.protobuf.Timestamp fetched_at = 2;
+}
+
+// GetReleaseDetailRequest selects a release by tag.
+message GetReleaseDetailRequest {
+  // Tag is the release tag, e.g. "v1.8.0". Validated as a semver-shaped
+  // string with an optional leading "v".
+  string tag = 1 [
+    (buf.validate.field).string.pattern = "^v?\\d+\\.\\d+\\.\\d+(?:[-.][0-9A-Za-z.-]+)?$",
+    (buf.validate.field).string.max_len = 64
+  ];
+}
+
+// GetReleaseDetailResponse returns the full Release.
+message GetReleaseDetailResponse {
+  Release release = 1;
+}
+
+// StartUpgradeRequest selects a release+asset and the sysupgrade flags.
+message StartUpgradeRequest {
+  // ReleaseTag identifies the release to install.
+  string release_tag = 1 [
+    (buf.validate.field).string.pattern = "^v?\\d+\\.\\d+\\.\\d+(?:[-.][0-9A-Za-z.-]+)?$",
+    (buf.validate.field).string.max_len = 64
+  ];
+
+  // AssetName is the filename within the release to download.
+  string asset_name = 2 [(buf.validate.field).string.max_len = 256];
+
+  // Options controls the sysupgrade(1) flags.
+  SysupgradeOptions options = 3;
+
+  // ForceInstallUnknownCurrent true permits installation when the
+  // current OpenMANET version cannot be parsed from /etc/openwrt_release
+  // (for recovery scenarios).
+  bool force_install_unknown_current = 4;
+}
+
+// StartUpgradeResponse is empty — progress arrives via the stream.
+message StartUpgradeResponse {}
+
+// CancelUpgradeResponse is empty.
+message CancelUpgradeResponse {}
+
+// GetUpgradeStatusResponse wraps the ProgressEvent so future scalar
+// fields can be added alongside it without breaking callers.
+message GetUpgradeStatusResponse {
+  ProgressEvent event = 1;
+}
+
+// StreamUpgradeProgressResponse wraps the ProgressEvent so the stream
+// frame type is distinct from the unary GetUpgradeStatus response.
+message StreamUpgradeProgressResponse {
+  ProgressEvent event = 1;
+}
