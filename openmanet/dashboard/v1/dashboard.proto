@@ -69,6 +69,16 @@ message NetworkSummaryEntry {
   // Free-form detail string shown next to the entry, such as an IP/CIDR,
   // "Connected — 3 neighbors", "4 originators", or "Not connected".
   string detail = 4;
+
+  // Cumulative received bytes counter from the kernel since interface
+  // creation (netlink RX_BYTES). Zero when the interface does not exist
+  // or carries no traffic.
+  uint64 rx_bytes = 5;
+
+  // Cumulative transmitted bytes counter from the kernel since interface
+  // creation (netlink TX_BYTES). Zero when the interface does not exist
+  // or carries no traffic.
+  uint64 tx_bytes = 6;
 }
 
 // NetworkSummary is the collection of network summary entries.
