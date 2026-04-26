@@ -100,6 +100,42 @@ message Release {
   repeated Asset assets = 7;
 }
 
+// StagedImage is a firmware image that has been uploaded by the
+// operator and is sitting on disk waiting to be flashed. Single-slot:
+// the manager tracks at most one staged image at a time, replacing the
+// previous file (if any) on a successful re-upload.
+message StagedImage {
+  // Filename is the original filename supplied by the uploader (e.g.
+  // "openmanet-1.9.0-bcm27xx-bcm2711-mm8108-usb-squashfs-sysupgrade.img.gz").
+  // Used both for display and for the filename heuristic match.
+  string filename = 1;
+
+  // SizeBytes is the size of the on-disk image.
+  int64 size_bytes = 2;
+
+  // Sha256 is the lowercase hex sha256 digest of the staged file,
+  // computed by the daemon as the bytes were streamed in.
+  string sha256 = 3;
+
+  // UploadedAt is the wall-clock timestamp the upload finalized.
+  google.protobuf.Timestamp uploaded_at = 4;
+
+  // FilenameMatchesTarget is true when the uploaded filename appears to
+  // contain the local device's target string (e.g. "bcm27xx-bcm2711"),
+  // false when it does not. Heuristic only — operators may still
+  // install on a mismatch via skip_preflight.
+  bool filename_matches_target = 5;
+
+  // PreflightOk is true when "sysupgrade -T" returned success against
+  // the staged image, false otherwise. When false, PreflightError
+  // carries the captured stderr line.
+  bool preflight_ok = 6;
+
+  // PreflightError is the captured short error line from a failed
+  // preflight; empty when PreflightOk is true.
+  string preflight_error = 7;
+}
+
 // Update is a single available upgrade target — a release combined with
 // the asset that matches the local hardware.
 message Update {

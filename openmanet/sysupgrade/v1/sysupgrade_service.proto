@@ -67,6 +67,21 @@ service SysupgradeService {
   // current snapshot first, then every state change until the client
   // disconnects.
   rpc StreamUpgradeProgress(google.protobuf.Empty) returns (stream StreamUpgradeProgressResponse);
+
+  // GetStagedImage returns metadata for the currently-staged uploaded
+  // image, if any. The image bytes themselves are uploaded out-of-band
+  // via POST /api/sysupgrade/upload (multipart/form-data).
+  rpc GetStagedImage(google.protobuf.Empty) returns (GetStagedImageResponse);
+
+  // DiscardStagedImage deletes the currently-staged image and clears
+  // its metadata. No-op when no image is staged.
+  rpc DiscardStagedImage(google.protobuf.Empty) returns (DiscardStagedImageResponse);
+
+  // StartLocalUpgrade kicks off the Verify → Exec sequence using the
+  // currently-staged uploaded image as the source. The download phase
+  // is skipped. Returns FailedPrecondition when no image is staged or
+  // an upgrade is already running.
+  rpc StartLocalUpgrade(StartLocalUpgradeRequest) returns (StartLocalUpgradeResponse);
 }
 
 // GetSystemInfoResponse wraps a SystemInfo so future fields can be added
@@ -148,3 +163,33 @@ message GetUpgradeStatusResponse {
 message StreamUpgradeProgressResponse {
   ProgressEvent event = 1;
 }
+
+// GetStagedImageResponse carries the StagedImage metadata. The image
+// field is unset when no image is currently staged.
+message GetStagedImageResponse {
+  StagedImage image = 1;
+}
+
+// DiscardStagedImageResponse is empty.
+message DiscardStagedImageResponse {}
+
+// StartLocalUpgradeRequest selects the install options for the
+// currently-staged uploaded image.
+message StartLocalUpgradeRequest {
+  // Options controls the sysupgrade(1) flags.
+  SysupgradeOptions options = 1;
+
+  // ForceInstallUnknownCurrent true permits installation when the
+  // current OpenMANET version cannot be parsed from /etc/openwrt_release.
+  bool force_install_unknown_current = 2;
+
+  // SkipPreflight true bypasses the requirement that the upload-time
+  // "sysupgrade -T" preflight succeeded. Operators set this when they
+  // know the staged image is correct despite a failed preflight (for
+  // example when flashing across an architecture rename).
+  bool skip_preflight = 3;
+}
+
+// StartLocalUpgradeResponse is empty — progress arrives via the
+// existing StreamUpgradeProgress RPC.
+message StartLocalUpgradeResponse {}
