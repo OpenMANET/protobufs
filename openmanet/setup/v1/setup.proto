@@ -152,6 +152,23 @@ message MeshRadioConfig {
   }];
 
   uint32 channel = 6 [(buf.validate.field).uint32.gt = 0];
+
+  // ISO 3166-1 alpha-2 country code (e.g. "US", "GB"). Used to constrain
+  // the legal channel list at the chosen bandwidth and written to
+  // `wireless.<radio>.country`. The frontend selects from
+  // GetSetupStatusResponse.countries; the handler validates that the
+  // (country, bandwidth, channel) tuple appears in the regulatory
+  // database loaded from /usr/share/morse-regdb/channels.csv.
+  //
+  // The buf.validate pattern accepts an empty string so the handler's
+  // own re-apply / regdb-presence checks fire first. Non-empty values
+  // must be 2-3 uppercase letters. The handler additionally rejects an
+  // empty country_code when the regdb is installed (see
+  // validateMeshCountry in setup.go).
+  string country_code = 7 [(buf.validate.field).string = {
+    max_len: 3
+    pattern: "^([A-Z]{2,3})?$"
+  }];
 }
 
 // MeshNodeProfile is the full first-boot configuration applied atomically
@@ -235,6 +252,24 @@ message SetupRadioBandwidth {
   repeated uint32 channels = 2;
 }
 
+// SetupCountry advertises one regulatory domain available on this device,
+// with the legal HaLow channels per bandwidth. Sourced at runtime from
+// /usr/share/morse-regdb/channels.csv (Morse Micro userspace package).
+message SetupCountry {
+  // ISO 3166-1 alpha-2 / FCC region code as it appears in the regdb
+  // (e.g. "US", "GB", "EU").
+  string code = 1;
+
+  // Display name of the country (e.g. "USA", "United Kingdom"). Pulled
+  // from the regdb's `country` column.
+  string name = 2;
+
+  // Legal HaLow channels at each supported bandwidth in this regulatory
+  // domain. Bandwidths absent from the regdb for this country are simply
+  // omitted (the wizard hides those bandwidth options).
+  repeated SetupRadioBandwidth bandwidths = 3;
+}
+
 // GetSetupStatusResponse populates the wizard's pre-flight gate.
 message GetSetupStatusResponse {
   // True when the wizard feature is allowed on this device. The
@@ -277,6 +312,17 @@ message GetSetupStatusResponse {
 
   // Built-in ethernet ports usable as gateway uplinks.
   repeated string ethernet_ports = 7;
+
+  // All HaLow regulatory domains available on this device, sourced from
+  // /usr/share/morse-regdb/channels.csv. Empty if the regdb file is
+  // missing or unreadable; the wizard falls back to a baked-in US-only
+  // default in that case so the flow does not block.
+  repeated SetupCountry countries = 8;
+
+  // Country code currently configured on the HaLow wifi-device (UCI
+  // `wireless.<morse-radio>.country`). The frontend uses this as the
+  // pre-selected default on the country dropdown.
+  string current_country = 9;
 }
 
 // ApplySetupRequest carries the complete profile to apply.
