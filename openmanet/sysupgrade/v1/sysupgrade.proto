@@ -104,10 +104,17 @@ message Release {
 // operator and is sitting on disk waiting to be flashed. Single-slot:
 // the manager tracks at most one staged image at a time, replacing the
 // previous file (if any) on a successful re-upload.
+//
+// Hardware compatibility is decided by parsing the OpenWrt FWx0
+// metadata trailer that `fwtool` appends to every sysupgrade image —
+// matching what LuCI's flash page does. The parsed device list is
+// compared against /etc/board.json's model.id (or the first compatible
+// string of /proc/device-tree/compatible). Filename pattern matching
+// is no longer used.
 message StagedImage {
   // Filename is the original filename supplied by the uploader (e.g.
   // "openmanet-1.9.0-bcm27xx-bcm2711-mm8108-usb-squashfs-sysupgrade.img.gz").
-  // Used both for display and for the filename heuristic match.
+  // Display only.
   string filename = 1;
 
   // SizeBytes is the size of the on-disk image.
@@ -120,11 +127,8 @@ message StagedImage {
   // UploadedAt is the wall-clock timestamp the upload finalized.
   google.protobuf.Timestamp uploaded_at = 4;
 
-  // FilenameMatchesTarget is true when the uploaded filename appears to
-  // contain the local device's target string (e.g. "bcm27xx-bcm2711"),
-  // false when it does not. Heuristic only — operators may still
-  // install on a mismatch via skip_preflight.
-  bool filename_matches_target = 5;
+  reserved 5;
+  reserved "filename_matches_target";
 
   // PreflightOk is true when "sysupgrade -T" returned success against
   // the staged image, false otherwise. When false, PreflightError
@@ -134,6 +138,37 @@ message StagedImage {
   // PreflightError is the captured short error line from a failed
   // preflight; empty when PreflightOk is true.
   string preflight_error = 7;
+
+  // MetadataPresent is true when a FWx0 INFO trailer was found in the
+  // image and decoded successfully. False for factory images and for
+  // third-party builds whose Makefile did not declare SUPPORTED_DEVICES.
+  bool metadata_present = 8;
+
+  // CompatVersion is the image's compat_version field (e.g. "1.0").
+  // Empty when MetadataPresent is false. Major-version mismatches are
+  // a hard incompatibility in OpenWrt sysupgrade.
+  string compat_version = 9;
+
+  // CompatMessage is the optional human-readable compat_message from
+  // the image; surfaced to the operator when present.
+  string compat_message = 10;
+
+  // SupportedDevices is the effective device list — i.e.
+  // new_supported_devices when CompatVersion != "1.0", otherwise
+  // supported_devices. Each entry is a device-tree compatible string
+  // such as "raspberrypi,4-model-b" or "vendor,mm6108-spi".
+  repeated string supported_devices = 11;
+
+  // DeviceCompat is the running device's first compatible string,
+  // sourced from /etc/board.json model.id (preferred) or the first
+  // null-separated token of /proc/device-tree/compatible.
+  string device_compat = 12;
+
+  // ImageCompatible is true when DeviceCompat appears verbatim in
+  // SupportedDevices. Always false when MetadataPresent is false (no
+  // list to match against, so the image cannot be vouched for from
+  // metadata alone).
+  bool image_compatible = 13;
 }
 
 // Update is a single available upgrade target — a release combined with
