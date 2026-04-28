@@ -283,4 +283,10 @@ message ProgressEvent {
 
   // UpdatedAt is the timestamp this event was generated.
   google.protobuf.Timestamp updated_at = 10;
+
+  // LogTail is the trailing portion of /sbin/sysupgrade's
+  // stdout+stderr log captured when the detached child exits without
+  // rebooting the device. Populated only on PhaseFailed transitions
+  // originating in the child watcher; empty for every other phase.
+  string log_tail = 11;
 }
