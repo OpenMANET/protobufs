@@ -351,10 +351,22 @@ message ApplySetupResult {
 // STATUS_DONE (or STATUS_FAILED) on exit. The terminal event has
 // phase=PHASE_TERMINAL and carries the ApplySetupResult.
 //
-// PHASE_TERMINAL is emitted BEFORE service reloads so the frontend
-// receives a clean success / failure signal even when the network
-// reconfiguration severs the streaming connection. See
-// docs/setup-wizard-phase-ordering.md for the rationale.
+// Phase ordering as of the post-bricking restructure:
+//   1..12  Validate, snapshot, reset, hostname, base-network, wireless,
+//          per-radio AP/STA, scenario, batman-adv, mesh11sd, commit.
+//   13     PASSWORD
+//   14     RELOAD_SERVICES (synchronous; reload then restart fallback)
+//   15     PERSIST_FLAGS  (atomic flip; only after reload succeeded)
+//   99     TERMINAL
+//
+// PHASE_RELOAD_SERVICES runs synchronously BEFORE PHASE_PERSIST_FLAGS
+// so the wizard only persists `setup.complete=true` when the reloaded
+// services actually picked up the new UCI. A pre-restructure version
+// emitted PHASE_TERMINAL before reload and let reload run in a fire-
+// and-forget goroutine; that turned a failed reload into a silent
+// brick (UCI committed, flags flipped, device unreachable, wizard
+// permanently disabled). Reload failures now abort PERSIST_FLAGS so
+// the user can re-run the wizard from CLI/console recovery.
 message ApplySetupResponse {
   enum Phase {
     PHASE_UNSPECIFIED = 0;
@@ -371,6 +383,7 @@ message ApplySetupResponse {
     PHASE_MESH11SD = 11;
     PHASE_COMMIT = 12;
     PHASE_PASSWORD = 13;
+    PHASE_RELOAD_SERVICES = 15;
     PHASE_PERSIST_FLAGS = 14;
     PHASE_TERMINAL = 99;
   }
