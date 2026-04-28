@@ -36,6 +36,16 @@ message MeshNeighbors {
   // chain resolution on the consumer side. Empty when the publisher is
   // running in a reduced-bandwidth mode.
   repeated Originator originators = 6;
+
+  // Lowercased MACs of every local layer-2 interface the publisher
+  // wants to be addressable by — bat0, bat-blos, vxlan0, wlan0, eth*,
+  // and so on. Always includes primary_mac. Receivers index records
+  // by every entry so a Lookup keyed on any one of them resolves the
+  // record in O(1), regardless of which interface MAC the caller has
+  // (alfred envelope, batadv-vis primary, originator next-hop, etc.).
+  // Critical in BLOS multi-mesh deployments where a single physical
+  // node is observed under different MACs by different consumers.
+  repeated string interface_macs = 7;
 }
 
 // MeshNeighbor records one direct batman-adv neighbor from the
