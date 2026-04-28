@@ -290,3 +290,38 @@ message ProgressEvent {
   // originating in the child watcher; empty for every other phase.
   string log_tail = 11;
 }
+
+// FactoryResetCapability summarizes whether the running OS supports
+// factory reset (overlay wipe + reboot, equivalent to LuCI's "Perform
+// Reset" button) and exposes the discovery details so the UI can
+// surface "why not" when capability is false. Mirrors LuCI's flash.js
+// render check: an overlayfs mount at / OR a rootfs_data partition in
+// /proc/mtd, plus the firstboot helper.
+message FactoryResetCapability {
+  // Capable is true when the device has both an overlay AND firstboot
+  // is installed and executable.
+  bool capable = 1;
+
+  // Reason is a short human-readable summary: "ok",
+  // "no rootfs_data partition or overlayfs mount",
+  // "firstboot not present at /sbin/firstboot", etc.
+  string reason = 2;
+
+  // OverlayMountpoint is the matched line from /proc/mounts when an
+  // overlay was found at /, e.g. "overlayfs:/overlay /". Empty when
+  // discovered via /proc/mtd instead.
+  string overlay_mountpoint = 3;
+
+  // BackingFs describes where the overlay state actually lives. Either
+  // the fstype reported by /proc/mounts ("overlay"), or
+  // "mtd:rootfs_data" when only the MTD partition was found.
+  string backing_fs = 4;
+
+  // FirstbootPath is the resolved path to the firstboot helper, set
+  // only when capable=true.
+  string firstboot_path = 5;
+
+  // Hostname is the device's current hostname, surfaced so the UI can
+  // use it as the typed-confirmation target without an extra round trip.
+  string hostname = 6;
+}

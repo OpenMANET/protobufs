@@ -82,6 +82,22 @@ service SysupgradeService {
   // is skipped. Returns FailedPrecondition when no image is staged or
   // an upgrade is already running.
   rpc StartLocalUpgrade(StartLocalUpgradeRequest) returns (StartLocalUpgradeResponse);
+
+  // GetFactoryResetCapability reports whether the running OS supports
+  // factory reset (overlay wipe + reboot, equivalent to LuCI's
+  // "Perform Reset" button) and surfaces the device's current
+  // hostname so the UI can use it as the typed-confirmation target.
+  rpc GetFactoryResetCapability(google.protobuf.Empty) returns (GetFactoryResetCapabilityResponse);
+
+  // PerformFactoryReset wipes the overlay and reboots the device. The
+  // operator must echo the device hostname in confirm_hostname; the
+  // server re-validates the match before triggering. Fire-and-forget:
+  // the RPC response may not flush before the kernel reboots, so
+  // clients must treat both 200 OK and a transport-closed error as
+  // "reset initiated." Returns FailedPrecondition when the device is
+  // not capable, when an upgrade is in progress, or when hostname is
+  // unknown; InvalidArgument when confirm_hostname does not match.
+  rpc PerformFactoryReset(PerformFactoryResetRequest) returns (PerformFactoryResetResponse);
 }
 
 // GetSystemInfoResponse wraps a SystemInfo so future fields can be added
@@ -193,3 +209,30 @@ message StartLocalUpgradeRequest {
 // StartLocalUpgradeResponse is empty — progress arrives via the
 // existing StreamUpgradeProgress RPC.
 message StartLocalUpgradeResponse {}
+
+// GetFactoryResetCapabilityResponse wraps the FactoryResetCapability so
+// future scalar fields can be added alongside it without breaking the
+// RPC.
+message GetFactoryResetCapabilityResponse {
+  FactoryResetCapability capability = 1;
+}
+
+// PerformFactoryResetRequest carries the typed-confirmation hostname.
+// The server re-validates the match against /etc/hostname before
+// triggering the wipe — UI-side validation alone is not sufficient.
+message PerformFactoryResetRequest {
+  // ConfirmHostname must equal the device's current hostname after
+  // trim + lowercase on both sides. Acts as a "type the device name
+  // to delete" guard, deliberately stronger than LuCI's single
+  // confirm() dialog.
+  string confirm_hostname = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 253
+  ];
+}
+
+// PerformFactoryResetResponse is empty. The response may never flush
+// to the client because firstboot reboots the device synchronously;
+// callers should treat a transport-closed error after >2s as "reset
+// initiated" rather than as a true failure.
+message PerformFactoryResetResponse {}
