@@ -61,6 +61,16 @@ message MeshNode {
   // record exists or the publisher did not timestamp the payload. Unset
   // (0) for self, which is always current.
   int32 gossip_age_seconds = 11;
+
+  // is_gateway is true when this node terminates a BLOS tunnel (vxlan0)
+  // for the rest of the mesh. Set for any peer batman-adv announces in
+  // the gateway list (`batctl gwj`) AND for any local-segment peer
+  // whose gossip reports vxlan0 neighbors that classify as remote.
+  // The UI surfaces this as a "GATEWAY" role label and uses it to
+  // anchor BLOS edges through the gateway rather than directly from
+  // the serving node when the broadcast overlay would otherwise hide
+  // the real bridging node.
+  bool is_gateway = 12;
 }
 
 // MeshEdge is one link in the mesh, canonicalized so A↔B appears once
