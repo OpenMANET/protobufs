@@ -64,6 +64,21 @@ message Position {
   google.protobuf.Timestamp last_update = 9;
 }
 
+// Constellation identifies the GNSS satellite system that emitted a signal.
+// Values match gpsd's gnssid encoding; UNSPECIFIED is reported for any
+// constellation the daemon could not identify.
+enum Constellation {
+  CONSTELLATION_UNSPECIFIED = 0;
+  CONSTELLATION_GPS = 1;
+  CONSTELLATION_SBAS = 2;
+  CONSTELLATION_GALILEO = 3;
+  CONSTELLATION_BEIDOU = 4;
+  CONSTELLATION_IMES = 5;
+  CONSTELLATION_QZSS = 6;
+  CONSTELLATION_GLONASS = 7;
+  CONSTELLATION_IRNSS = 8;
+}
+
 // Satellite describes a single GNSS satellite currently visible to the
 // receiver, including its orbital position, signal quality, and whether it
 // is actively contributing to the navigation solution.
@@ -88,6 +103,11 @@ message Satellite {
   // used indicates whether this satellite is currently included in the
   // receiver's navigation solution.
   bool used = 5;
+
+  // constellation identifies the GNSS system this satellite belongs to.
+  // CONSTELLATION_UNSPECIFIED is emitted by older receivers or by gpsd
+  // builds that do not propagate the gnssid field.
+  Constellation constellation = 6;
 }
 
 // SatelliteStatus provides an overview of the GNSS satellite constellation
