@@ -45,6 +45,10 @@ message SystemResources {
 
   // Currently used overlay filesystem space in bytes.
   int64 overlay_used_bytes = 7;
+
+  // CPU temperature in degrees Celsius. Negative values mean the running
+  // device does not expose a CPU thermal sensor.
+  float cpu_temp_celsius = 8;
 }
 
 // NetworkInterfaceState indicates the connectivity state of a network entry.
