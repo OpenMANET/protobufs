@@ -6,6 +6,10 @@ import "buf/validate/validate.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
 import "openmanet/mesh_topology/v1/mesh_topology.proto";
+import "openmanet/network/v1/node.proto";
+import "openmanet/service/v1/interface.proto";
+import "openmanet/service/v1/mesh.proto";
+import "openmanet/service/v1/status.proto";
 
 // MeshTopologyService exposes the full mesh network topology gathered by
 // alfred (via batadv-vis -f jsondoc). The response mirrors the jsondoc
@@ -24,6 +28,15 @@ service MeshTopologyService {
   // delta tracker is not running (e.g. batadv-vis unavailable at
   // startup) and CodeInternal on unexpected failures.
   rpc GetMeshTopologyDelta(GetMeshTopologyDeltaRequest) returns (GetMeshTopologyDeltaResponse) {}
+
+  // GetMeshSnapshot bundles the four mesh-status reads (service status,
+  // known nodes, direct neighbors, wireless interfaces) into a single
+  // response so callers polling the dashboard pay one round-trip per
+  // tick instead of four. Partial failures are tolerated: each section
+  // is independently populated, and the call returns a non-nil error
+  // joined from any section that failed so callers can render
+  // best-effort UI on a degraded subset.
+  rpc GetMeshSnapshot(google.protobuf.Empty) returns (GetMeshSnapshotResponse) {}
 }
 
 // GetMeshTopologyResponse carries a single mesh-topology snapshot.
@@ -42,6 +55,27 @@ message GetMeshTopologyDeltaRequest {
     gte: {seconds: 1}
     lte: {seconds: 300}
   }];
+}
+
+// GetMeshSnapshotResponse bundles the per-tick mesh-status sections into
+// a single round trip. Any section may be unset/empty if its underlying
+// data source failed; the RPC's error value will be non-nil in that case
+// even when the response is partially populated.
+message GetMeshSnapshotResponse {
+  // status is the aggregate mesh service status (connectivity,
+  // gateway role, neighbor count). Unset when the status read failed.
+  openmanet.service.v1.ServiceStatus status = 1;
+
+  // nodes is the list of mesh nodes known to the local node from the
+  // bat-hosts table.
+  repeated openmanet.network.v1.Node nodes = 2;
+
+  // neighbors is the list of direct mesh neighbors observed via batctl
+  // and the wireless driver.
+  repeated openmanet.service.v1.MeshNeighbor neighbors = 3;
+
+  // interfaces is the list of wireless interfaces involved in the mesh.
+  repeated openmanet.service.v1.WirelessInterface interfaces = 4;
 }
 
 // GetMeshTopologyDeltaResponse carries aggregated mesh-network churn
