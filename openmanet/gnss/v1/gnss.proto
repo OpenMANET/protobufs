@@ -133,12 +133,34 @@ message SatelliteStatus {
   google.protobuf.Timestamp last_update = 4;
 }
 
+// GNSSSource identifies which position provider feeds the GNSS subsystem.
+enum GNSSSource {
+  // GNSS_SOURCE_UNSPECIFIED is treated as GNSS_SOURCE_INTERNAL.
+  GNSS_SOURCE_UNSPECIFIED = 0;
+
+  // GNSS_SOURCE_INTERNAL uses the position reported by the local GNSS
+  // receiver via gpsd (onboard or USB-attached hardware).
+  GNSS_SOURCE_INTERNAL = 1;
+
+  // GNSS_SOURCE_EXTERNAL_COT adopts the position broadcast by a connected
+  // end-user device (e.g. ATAK) as Cursor-on-Target over the SA multicast
+  // group, instead of reading a local receiver. Lets a node with no GNSS
+  // hardware still report its own position, using the EUD's (typically
+  // more accurate) fix.
+  GNSS_SOURCE_EXTERNAL_COT = 2;
+}
+
 // GNSSSettings holds the top-level GNSS receiver configuration that
-// controls whether the GPS subsystem is active.
+// controls whether the GPS subsystem is active and where its position
+// data comes from.
 message GNSSSettings {
   // enable_gps controls whether the GNSS receiver subsystem is active.
   // When false, no position data is collected or distributed.
   bool enable_gps = 1;
+
+  // source selects which position provider feeds the GNSS subsystem.
+  // GNSS_SOURCE_UNSPECIFIED is treated as GNSS_SOURCE_INTERNAL.
+  GNSSSource source = 2;
 }
 
 // OutputProtocols configures how position data is distributed to external
