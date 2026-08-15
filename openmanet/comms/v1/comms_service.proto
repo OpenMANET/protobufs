@@ -71,4 +71,12 @@ service CommsService {
   // StreamAudioRx is a server-streaming RPC: the server streams
   // Opus-encoded audio frames received from the mesh back to the web client.
   rpc StreamAudioRx(StreamAudioRxRequest) returns (stream StreamAudioRxResponse);
+
+  // Reads the device's hardware audio mixer state. Never fails on a
+  // missing sound card — available=false is the "no card" signal.
+  rpc GetAudioMixer(google.protobuf.Empty) returns (GetAudioMixerResponse);
+
+  // Applies the provided fields to the hardware mixer and persists
+  // volumes and AGC so the levels survive a reboot.
+  rpc UpdateAudioMixer(UpdateAudioMixerRequest) returns (UpdateAudioMixerResponse);
 }
