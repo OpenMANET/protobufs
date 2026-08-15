@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package openmanet.comms.v1;
 
+import "buf/validate/validate.proto";
+
 // SendPTTEventRequest carries a PTT state change from the web client.
 message SendPTTEventRequest {
   // PTT event type: 0 = PTTDown (begin TX), 1 = PTTUp (end TX),
@@ -47,3 +49,60 @@ message StreamAudioTxResponse {
 
 // StreamAudioRxRequest initiates a server-streaming RX audio session.
 message StreamAudioRxRequest {}
+
+// AudioMixerState is a point-in-time reading of the hardware mixer on the
+// device's sound card (the OpenVLM / CM108B in production). Optional
+// fields are absent when the corresponding ALSA control does not exist on
+// the card.
+message AudioMixerState {
+  // Whether an ALSA card was resolved. When false every other field is
+  // absent/empty.
+  bool available = 1;
+
+  // Playback (speaker) volume percent.
+  optional int32 speaker_volume = 2;
+
+  // Capture (microphone) volume percent.
+  optional int32 mic_volume = 3;
+
+  // Auto Gain Control switch. When enabled the CM108B adjusts capture
+  // gain itself and manual mic_volume changes may appear ineffective.
+  optional bool agc_enabled = 4;
+
+  // Resolved raw ALSA element name backing speaker_volume ("" if absent).
+  string speaker_control = 5;
+
+  // Resolved raw ALSA element name backing mic_volume ("" if absent).
+  string mic_control = 6;
+
+  // Resolved raw ALSA element name backing agc_enabled ("" if absent).
+  string agc_control = 7;
+}
+
+// GetAudioMixerResponse carries the current hardware mixer state.
+message GetAudioMixerResponse {
+  AudioMixerState state = 1;
+}
+
+// UpdateAudioMixerRequest applies a partial hardware mixer update: only
+// fields that are set are written. Volumes are persisted to the daemon
+// config and re-applied at startup; hardware VOL+/VOL- button presses are
+// deliberately not persisted.
+message UpdateAudioMixerRequest {
+  optional int32 speaker_volume = 1 [(buf.validate.field).int32 = {
+    gte: 0
+    lte: 100
+  }];
+
+  optional int32 mic_volume = 2 [(buf.validate.field).int32 = {
+    gte: 0
+    lte: 100
+  }];
+
+  optional bool agc_enabled = 3;
+}
+
+// UpdateAudioMixerResponse carries the mixer state after the update.
+message UpdateAudioMixerResponse {
+  AudioMixerState state = 1;
+}
