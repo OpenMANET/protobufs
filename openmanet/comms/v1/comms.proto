@@ -39,6 +39,11 @@ message StreamAudioRxResponse {
   // Callsign of the remote peer whose audio this frame belongs to.
   // Empty if the sender did not include a callsign extension.
   string callsign = 3;
+
+  // 1-based talk group channel this frame was received on. 0 when the
+  // server predates this field or the receiving port has no talk group
+  // mapping; consumers should treat 0 as channel 1 for compatibility.
+  int32 talkgroup = 4;
 }
 
 // StreamAudioTxResponse is returned when the client closes the TX stream.
