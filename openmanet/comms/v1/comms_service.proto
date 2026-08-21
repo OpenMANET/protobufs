@@ -60,6 +60,14 @@ service CommsService {
   // Enables or disables RTP reception on the specified talkgroup.
   rpc SetReceiveTalkGroup(SetReceiveTalkGroupRequest) returns (SetReceiveTalkGroupResponse);
 
+  // SelectTalkGroup makes the requested talk group the single active
+  // channel: RX+TX enabled on it, all other groups disabled.
+  rpc SelectTalkGroup(SelectTalkGroupRequest) returns (SelectTalkGroupResponse);
+
+  // StreamTalkGroupEvents streams talk group selection and direction
+  // toggle changes to the client.
+  rpc StreamTalkGroupEvents(google.protobuf.Empty) returns (stream StreamTalkGroupEventsResponse);
+
   // SendPTTEvent sends a PTT state change from the web client.
   rpc SendPTTEvent(SendPTTEventRequest) returns (SendPTTEventResponse);
 
