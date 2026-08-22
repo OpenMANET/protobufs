@@ -3,6 +3,7 @@ syntax = "proto3";
 package openmanet.setup.v1;
 
 import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
 import "openmanet/common/v1/options.proto";
 import "openmanet/wifi_config/v1/wifi_config.proto";
 
@@ -220,6 +221,17 @@ message MeshNodeProfile {
   // One entry per non-mesh radio the operator wants to expose as an AP.
   // Radios omitted from this list stay disabled. Order is not significant.
   repeated RadioApProfile aps = 8;
+
+  // IANA timezone name (e.g. "America/Denver"). Optional; empty keeps
+  // the device's current timezone. Membership in the device's zone
+  // table is validated in the handler (not expressible in
+  // protovalidate) and rejected with INVALID_ARGUMENT.
+  string timezone = 9 [(buf.validate.field).string.max_len = 64];
+
+  // Browser wall clock captured when the operator pressed Apply (not
+  // at page load). Used to correct the device clock when drift
+  // exceeds 10s. Optional; best-effort on the device side.
+  google.protobuf.Timestamp client_time = 10;
 }
 
 // SetupRadio describes one physical radio's hardware capabilities for the
@@ -323,6 +335,14 @@ message GetSetupStatusResponse {
   // `wireless.<morse-radio>.country`). The frontend uses this as the
   // pre-selected default on the country dropdown.
   string current_country = 9;
+
+  // IANA zone names the device accepts, sorted. Drives the wizard's
+  // timezone select so the list is device-authoritative.
+  repeated string timezones = 10;
+
+  // Currently configured IANA zone (system.@system[0].zonename);
+  // empty when unset.
+  string current_timezone = 11;
 }
 
 // ApplySetupRequest carries the complete profile to apply.
@@ -351,22 +371,41 @@ message ApplySetupResult {
 // STATUS_DONE (or STATUS_FAILED) on exit. The terminal event has
 // phase=PHASE_TERMINAL and carries the ApplySetupResult.
 //
-// Phase ordering as of the post-bricking restructure:
-//   1..12  Validate, snapshot, reset, hostname, base-network, wireless,
-//          per-radio AP/STA, scenario, batman-adv, mesh11sd, commit.
-//   13     PASSWORD
-//   14     RELOAD_SERVICES (synchronous; reload then restart fallback)
-//   15     PERSIST_FLAGS  (atomic flip; only after reload succeeded)
-//   99     TERMINAL
+// Phase ordering as of the post-bricking restructure. Enum numbers do
+// NOT track execution order for the phases annotated below — this list
+// is EXECUTION order, with each entry's real enum value called out:
+//   1     VALIDATE
+//   2     SNAPSHOT
+//   3     RESET_WIRELESS
+//   4     RESET_NETWORK
+//   5     HOSTNAME
+//   16    SET_TIMEZONE      (numbered 16 because 14/15 were already
+//                             consumed by the reload/persist restructure
+//                             below, but it EXECUTES here — between
+//                             HOSTNAME and BASE_NETWORK — so the device
+//                             clock and locale are correct before any
+//                             network state is touched)
+//   6     BASE_NETWORK
+//   7     WIRELESS_MESH
+//   8     PER_RADIO_AP_STA
+//   9     SCENARIO_TOPOLOGY
+//   10    BATMAN_ADV
+//   11    MESH11SD
+//   12    COMMIT
+//   13    PASSWORD
+//   15    RELOAD_SERVICES   (synchronous; reload then restart fallback)
+//   14    PERSIST_FLAGS     (atomic flip; only after reload succeeded)
+//   99    TERMINAL
 //
-// PHASE_RELOAD_SERVICES runs synchronously BEFORE PHASE_PERSIST_FLAGS
-// so the wizard only persists `setup.complete=true` when the reloaded
-// services actually picked up the new UCI. A pre-restructure version
-// emitted PHASE_TERMINAL before reload and let reload run in a fire-
-// and-forget goroutine; that turned a failed reload into a silent
-// brick (UCI committed, flags flipped, device unreachable, wizard
-// permanently disabled). Reload failures now abort PERSIST_FLAGS so
-// the user can re-run the wizard from CLI/console recovery.
+// PHASE_RELOAD_SERVICES (enum 15) runs synchronously BEFORE
+// PHASE_PERSIST_FLAGS (enum 14) so the wizard only persists
+// `setup.complete=true` when the reloaded services actually picked up
+// the new UCI. A pre-restructure version emitted PHASE_TERMINAL before
+// reload and let reload run in a fire-and-forget goroutine; that
+// turned a failed reload into a silent brick (UCI committed, flags
+// flipped, device unreachable, wizard permanently disabled). Reload
+// failures now abort PERSIST_FLAGS so the user can re-run the wizard
+// from CLI/console recovery.
 message ApplySetupResponse {
   enum Phase {
     PHASE_UNSPECIFIED = 0;
@@ -385,6 +424,12 @@ message ApplySetupResponse {
     PHASE_PASSWORD = 13;
     PHASE_RELOAD_SERVICES = 15;
     PHASE_PERSIST_FLAGS = 14;
+
+    // Stages system.zonename + POSIX timezone; runs between
+    // PHASE_HOSTNAME and PHASE_BASE_NETWORK. Numbered 16 because 14/15
+    // were consumed by the reload/persist restructure (numbers no
+    // longer track execution order — see the ordering comment above).
+    PHASE_SET_TIMEZONE = 16;
     PHASE_TERMINAL = 99;
   }
 
