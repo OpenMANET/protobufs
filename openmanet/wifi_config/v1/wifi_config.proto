@@ -51,6 +51,12 @@ enum WifiEncryption {
   WIFI_ENCRYPTION_NONE = 5 [(openmanet.common.v1.string_name) = "none"];
 
   WIFI_ENCRYPTION_OWE = 6 [(openmanet.common.v1.string_name) = "owe"];
+
+  // WPA2/WPA3 transition mode: OpenWrt maps sae-mixed to
+  // auth_type=psk-sae (WPA2-PSK and WPA3-SAE both accepted). This is
+  // the "WPA2/WPA3 mixed" the LuCI mesh wizard offers; psk-mixed is
+  // WPA1+WPA2 and must not be labelled as WPA3.
+  WIFI_ENCRYPTION_SAE_MIXED = 7 [(openmanet.common.v1.string_name) = "sae-mixed"];
 }
 
 // WifiHTMode identifies the high-throughput / channel-width mode.
