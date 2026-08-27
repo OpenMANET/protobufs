@@ -127,10 +127,11 @@ message MeshRadioConfig {
 
   string passphrase = 3 [(buf.validate.field).string.max_len = 63];
 
-  // SAE or NONE for S1G mesh — restricted at handler validation phase.
+  // WPA3 (SAE) is the only encryption an 802.11s mesh link may use;
+  // open meshes are rejected here, not in the handler.
   openmanet.wifi_config.v1.WifiEncryption encryption = 4 [(buf.validate.field).enum = {
     defined_only: true
-    not_in: [0]
+    in: [1]
   }];
 
   // S1G channel numbering depends on bandwidth, so the wizard captures
