@@ -81,6 +81,22 @@ message WifiStaProfile {
   }];
 }
 
+// MeshBackhaulProfile turns a non-HaLow radio into a second batman-adv
+// mesh link (UCI network batmesh1) instead of a client AP. The link is
+// always WPA3 (SAE) with its own mesh ID and passphrase; every node on
+// the 2.4 GHz backhaul must share both.
+message MeshBackhaulProfile {
+  string mesh_id = 1 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 32
+  }];
+
+  string passphrase = 2 [(buf.validate.field).string = {
+    min_len: 8
+    max_len: 63
+  }];
+}
+
 // RadioApProfile configures one non-mesh radio's AP interface for client
 // devices ("Client device Wi-Fi" in the wizard UI).
 message RadioApProfile {
@@ -99,6 +115,12 @@ message RadioApProfile {
     defined_only: true
     not_in: [0]
   }];
+
+  // When set, this radio runs a mesh backhaul instead of an AP. The
+  // handler requires enabled=false, ignores ssid/passphrase/encryption
+  // (encryption must still be a defined non-zero value — send SAE), and
+  // accepts at most one backhaul entry per profile.
+  MeshBackhaulProfile mesh_backhaul = 6;
 }
 
 // Uplink describes how a Mesh Gate connects upstream.
@@ -189,6 +211,9 @@ message MeshRadioConfig {
 //     bandwidth on the chosen radio
 //   - device_mode oneof must match role (MESH_GATE -> meshgate_mode,
 //     MESH_POINT -> meshpoint_mode)
+//   - at most one aps[] entry carries mesh_backhaul; that entry must have
+//     enabled=false, its radio must not be the STA uplink radio, and the
+//     device must report supports_mesh_backhaul=true for it
 message MeshNodeProfile {
   // RFC 1123 hostname label: 1..63 chars, alphanumeric, hyphens allowed
   // internally, must NOT start or end with a hyphen.
@@ -244,7 +269,9 @@ message SetupRadio {
   // Frequency band of the radio.
   string band = 2;
 
-  // Human-readable hardware label (chipset / model).
+  // Human-readable hardware label: the iwinfo chipset name when the
+  // radio's live interface can be resolved (e.g. "MediaTek MT7915AN"),
+  // else the UCI device path.
   string hardware_name = 3;
 
   // Per-bandwidth legal channel list, populated from regulatory data.
@@ -257,6 +284,11 @@ message SetupRadio {
   // valid mesh radio candidates. The wizard refuses to enter when no
   // SetupRadio has is_halow=true.
   bool is_halow = 5;
+
+  // True when the daemon would accept this radio as the 2.4 GHz mesh
+  // backhaul: band 2g, not HaLow, chipset MT7915/MT7916 as reported by
+  // iwinfo through the radio's live interface. False when unresolvable.
+  bool supports_mesh_backhaul = 6;
 }
 
 // SetupRadioBandwidth lists legal channels at a single bandwidth.
