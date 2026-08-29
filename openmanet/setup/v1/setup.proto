@@ -87,7 +87,7 @@ message WifiStaProfile {
 // MeshBackhaulProfile turns a non-HaLow radio into a second batman-adv
 // mesh link (UCI network batmesh1) instead of a client AP. The link is
 // always WPA3 (SAE) with its own mesh ID and passphrase; every node on
-// the 2.4 GHz backhaul must share both.
+// the 2.4 GHz backhaul must share both, plus the channel and width.
 message MeshBackhaulProfile {
   string mesh_id = 1 [(buf.validate.field).string = {
     min_len: 1
@@ -97,6 +97,28 @@ message MeshBackhaulProfile {
   string passphrase = 2 [(buf.validate.field).string = {
     min_len: 8
     max_len: 63
+  }];
+
+  // Radio width for the backhaul link. 0 keeps the daemon's fixed
+  // default (HE20); otherwise 20 or 40 (HE20 / HE40).
+  uint32 bandwidth_mhz = 3 [(buf.validate.field).uint32 = {
+    in: [
+      0,
+      20,
+      40
+    ]
+  }];
+
+  // 2.4 GHz channel, 1..11. 0 keeps the daemon's fixed default (8). The
+  // handler rejects a non-zero channel with a zero bandwidth_mhz and the
+  // reverse.
+  uint32 channel = 4 [(buf.validate.field).uint32.lte = 11];
+
+  // Regulatory country written to the backhaul radio. Empty leaves the
+  // radio's current country untouched.
+  string country_code = 5 [(buf.validate.field).string = {
+    max_len: 3
+    pattern: "^([A-Z]{2,3})?$"
   }];
 }
 
