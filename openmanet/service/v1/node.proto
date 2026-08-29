@@ -12,7 +12,10 @@ service NodeService {
   // Retrieves detailed information for a specific node by hostname.
   rpc GetNode(GetNodeRequest) returns (GetNodeResponse) {}
 
-  // Lists all available nodes currently managed by the system.
+  // Lists all nodes currently managed by the system. Rows are fed by the
+  // alfred poll and expire: a peer silent for longer than alfred.nodeExpiry
+  // (default 24h) is deleted on the next poll and drops out of this list.
+  // No expiry runs while alfred itself is unreachable.
   rpc ListNodes(google.protobuf.Empty) returns (ListNodesResponse) {}
 }
 

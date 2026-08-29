@@ -20,7 +20,9 @@ message MeshNeighbor {
   // Last seen in miliseconds
   int64 last_seen = 5;
 
-  // throughput to the neighbor node.
+  // Throughput to the neighbor node in bit/s: the nl80211 station transmit
+  // bitrate, replaced by the batman-adv link throughput (from `batctl nj`,
+  // kbit/s scaled up) when the neighbor is known to batman-adv.
   int32 throughput = 6;
 }
 
