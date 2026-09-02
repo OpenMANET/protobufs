@@ -100,7 +100,7 @@ message MeshBackhaulProfile {
   }];
 
   // Radio width for the backhaul link. 0 keeps the daemon's fixed
-  // default (HE20); otherwise 20 or 40 (HE20 / HE40).
+  // default (HE40); otherwise 20 or 40 (HE20 / HE40).
   uint32 bandwidth_mhz = 3 [(buf.validate.field).uint32 = {
     in: [
       0,

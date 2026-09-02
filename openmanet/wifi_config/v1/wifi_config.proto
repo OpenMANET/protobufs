@@ -210,6 +210,21 @@ message RadioSettings {
 
   // Operating mode. UNSPECIFIED means "do not change" on updates.
   WifiMode mode = 10;
+
+  // Peer admission floor in dBm for a mesh-mode iface: wpa_supplicant
+  // refuses to peer with a station heard below it (UCI
+  // mesh_rssi_threshold). The daemon writes -80 for the 2.4 GHz
+  // secondary link at setup; -85 admits weaker peers in open terrain,
+  // -70 drops marginal ones in dense sites. Unset on an update leaves
+  // the UCI option alone; unset on a read means the option is absent or
+  // the iface is not mesh.
+  optional int32 mesh_rssi_threshold = 11 [
+    (buf.validate.field).int32 = {
+      gte: -85
+      lte: -70
+    },
+    (buf.validate.field).int32.example = -80
+  ];
 }
 
 // ConnectedClient represents an AP-connected wireless client.
