@@ -13,6 +13,10 @@ enum ControlSource {
   CONTROL_SOURCE_NANOPTT = 2 [(openmanet.common.v1.string_name) = "nanoptt"];
 
   CONTROL_SOURCE_WEB = 3 [(openmanet.common.v1.string_name) = "web"];
+
+  CONTROL_SOURCE_BS22 = 4 [(openmanet.common.v1.string_name) = "bs22"];
+
+  CONTROL_SOURCE_BLUEALSA_XEVENT = 5 [(openmanet.common.v1.string_name) = "bluealsa_xevent"];
 }
 
 // GetCommsConfigResponse is used to request the current communications configuration.
