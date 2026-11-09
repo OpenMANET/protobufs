@@ -1,0 +1,75 @@
+syntax = "proto3";
+package openmanet.bluetooth.v1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/empty.proto";
+
+service BluetoothService {
+  rpc GetBluetoothStatus(google.protobuf.Empty) returns (GetBluetoothStatusResponse);
+  rpc ExecuteBluetoothAction(ExecuteBluetoothActionRequest) returns (ExecuteBluetoothActionResponse);
+  rpc UpdateBluetoothPreferences(UpdateBluetoothPreferencesRequest) returns (UpdateBluetoothPreferencesResponse);
+}
+
+enum BluetoothAction {
+  BLUETOOTH_ACTION_UNSPECIFIED = 0;
+  BLUETOOTH_ACTION_BEGIN_SETUP = 1;
+  BLUETOOTH_ACTION_DISCOVER = 2;
+  BLUETOOTH_ACTION_CONNECT = 3;
+  BLUETOOTH_ACTION_ACTIVATE = 4;
+  BLUETOOTH_ACTION_DISCONNECT = 5;
+  BLUETOOTH_ACTION_OFF = 6;
+  BLUETOOTH_ACTION_FORGET = 7;
+  BLUETOOTH_ACTION_TEST_TONE = 8;
+}
+
+message BluetoothController {
+  string path = 1;
+  string address = 2;
+  string name = 3;
+  bool powered = 4;
+  bool discovering = 5;
+}
+message BluetoothAccessory {
+  string path = 1;
+  string controller_path = 2;
+  string address = 3;
+  string name = 4;
+  bool paired = 5;
+  bool connected = 6;
+  bool supported = 7;
+}
+message GetBluetoothStatusResponse {
+  bool available = 1;
+  bool enabled = 2;
+  bool connection_allowed = 3;
+  bool active = 4;
+  bool ready = 5;
+  bool audio_ready = 6;
+  bool buttons_ready = 7;
+  bool hfp_ready = 8;
+  bool button_pressed = 9;
+  bool auto_enable = 10;
+  string selected_device_path = 11;
+  string saved_device_address = 12;
+  string saved_device_name = 13;
+  repeated BluetoothController controllers = 14;
+  repeated BluetoothAccessory accessories = 15;
+}
+message ExecuteBluetoothActionRequest {
+  option (buf.validate.message).cel = {
+    id: "bluetooth.action_selection"
+    message: "Select a controller for setup or an accessory to connect"
+    expression: "(this.action != 1 || this.controller_path != '') && (this.action != 3 || this.device_path != '')"
+  };
+  BluetoothAction action = 1 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+  string controller_path = 2 [(buf.validate.field).string.max_len = 128];
+  string device_path = 3 [(buf.validate.field).string.max_len = 256];
+}
+message ExecuteBluetoothActionResponse {}
+message UpdateBluetoothPreferencesRequest {
+  bool auto_enable = 1;
+}
+message UpdateBluetoothPreferencesResponse {}
